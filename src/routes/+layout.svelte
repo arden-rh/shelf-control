@@ -1,7 +1,8 @@
 <script lang="ts">
+	import '../app.pcss';
 	import { onMount } from 'svelte';
-	import { session} from '$lib/session';
-    import type { SessionState, User } from '$lib/session';
+	import { session } from '$lib/session';
+	import type { SessionState, User } from '$lib/session';
 	import { goto } from '$app/navigation';
 	import { signOut } from 'firebase/auth';
 	import { auth } from '$lib/firebase.client';
@@ -21,7 +22,7 @@
 		const user: any = await data.getAuthUser();
 
 		const loggedIn = !!user;
-        
+
 		session.update((current: SessionState) => {
 			loading = false;
 			return {
