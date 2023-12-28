@@ -39,6 +39,10 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"firebase": "^10.7.1"
+		"@apollo/client": "^3.8.8",
+		"@sveltestack/svelte-query": "^1.6.0",
+		"firebase": "^10.7.1",
+		"graphql": "^16.8.1",
+		"graphql-request": "^6.1.0"
 	}
 }

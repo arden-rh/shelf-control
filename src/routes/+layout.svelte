@@ -1,11 +1,23 @@
+<script context="module" lang="ts">
+	export const queryClient = new QueryClient({
+		defaultOptions: {
+			queries: {
+				enabled: browser
+			}
+		}
+	});
+</script>
+
 <script lang="ts">
 	import '../app.pcss';
-	import { onMount } from 'svelte';
-	import { session } from '$lib/session';
-	import type { SessionState, User } from '$lib/session';
-	import { goto } from '$app/navigation';
-	import { signOut } from 'firebase/auth';
 	import { auth } from '$lib/firebase.client';
+	import { browser } from '$app/environment';
+	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
+	import { QueryClient, QueryClientProvider } from '@sveltestack/svelte-query';
+	import { session } from '$lib/session';
+	import { signOut } from 'firebase/auth';
+	import type { SessionState, User } from '$lib/session';
 
 	import type { LayoutData } from './$types';
 	export let data: LayoutData;
@@ -39,11 +51,17 @@
 	});
 </script>
 
-{#if loading}
-	<div>Loading...</div>
-{:else}
-	<div>
-		Logged in: {loggedIn}
-		<slot />
-	</div>
-{/if}
+<QueryClientProvider client={queryClient}>
+	<nav>
+		{#if loading}
+			<div>Loading...</div>
+		{:else}
+			<div>
+				Logged in: {loggedIn}
+				<slot name='nav' />
+			</div>
+		{/if}
+	</nav>
+
+	<slot />
+</QueryClientProvider>
