@@ -8,11 +8,12 @@
 	import { goto } from '$app/navigation';
 	import { toUserBook } from '$lib/utility/toUserBook';
 	import { useQuery } from '@sveltestack/svelte-query';
-	import type { UserBook, VolumeInfo } from '$lib/types/books.types';
+	import type { LibraryBook, VolumeInfo } from '$lib/types/books.types';
 	import type { PageData } from './$types';
 
 	const q = writable('');
 	const selectedBook = writable({} as VolumeInfo);
+	const testUserId = 'jB9gd9zwX8gP9Dcosxz3';
 
 	export let data: PageData;
 
@@ -31,12 +32,14 @@
 
 		const bookValue = toUserBook(selectedBookValue)
 
-		const book: UserBook = {
+		const book: LibraryBook = {
 			...bookValue,
-			userId: 'test'
+			userId: testUserId,
 		};
 
-		await createBook(book);
+		const userId = testUserId;
+
+		await createBook(userId, book);
 	}
 
 	// const queryResult = useQuery<BooksResponse>(

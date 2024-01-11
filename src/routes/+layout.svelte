@@ -50,6 +50,17 @@
 			goto('/');
 		}
 	});
+
+    async function handleLogout() {
+        try {
+            await signOut(auth);
+            session.update(() => ({ user: null, loading: false, loggedIn: false }));
+            goto('/login');
+        } catch (error) {
+            console.error('Logout failed:', error);
+        }
+    }
+
 </script>
 
 <QueryClientProvider client={queryClient}>
@@ -62,6 +73,7 @@
 				<slot name="nav" />
 			</div>
 		{/if}
+		<button on:click={handleLogout}>Logout</button>
 	</nav>
 
 	<slot />

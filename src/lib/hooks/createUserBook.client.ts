@@ -1,7 +1,7 @@
 import { doc, setDoc } from 'firebase/firestore';
 import { FirebaseError } from '@firebase/util';
-import type { UserBook } from '$lib/types/books.types';
-import { getBookCollection } from '$lib/firebase.client';
+import type { LibraryBook } from '$lib/types/books.types';
+import { getUserLibraryCollection } from '$lib/firebase.client';
 import { writable } from 'svelte/store';
 
 export const errorMsg = writable<string | null>(null);
@@ -9,7 +9,7 @@ export const error = writable<boolean>(false);
 export const success = writable<boolean>(false);
 export const loading = writable<boolean>(false);
 
-export async function createBook(data: UserBook) {
+export async function createBook(userId: string, data: LibraryBook) {
 		success.set(false);
 		error.set(false);
 		errorMsg.set(null);
@@ -17,13 +17,13 @@ export async function createBook(data: UserBook) {
 		try {
 			loading.set(true);
 
-			const bookCollection = await getBookCollection();
+			const libraryCollection = await getUserLibraryCollection(userId);
 
-			if (!bookCollection) {
+			if (!libraryCollection) {
 				throw new Error('Book collection is not initialized');
 			}
 
-			const docRef = doc(bookCollection);
+			const docRef = doc(libraryCollection);
 			await setDoc(docRef, { ...data, _id: docRef.id });
 
 			success.set(true);

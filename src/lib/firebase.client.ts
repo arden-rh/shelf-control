@@ -1,18 +1,17 @@
 import { browser } from '$app/environment';
-import { CollectionReference, collection, getFirestore } from 'firebase/firestore';
-import { connectAuthEmulator, getAuth } from 'firebase/auth';
+import { collection, doc, getFirestore } from 'firebase/firestore';
+import { connectAuthEmulator, getAuth} from 'firebase/auth';
 import { initializeApp, getApps } from 'firebase/app';
 import type { Auth } from 'firebase/auth';
-import type { DocumentData, Firestore } from 'firebase/firestore';
+import type { Firestore } from 'firebase/firestore';
 import type { FirebaseApp } from 'firebase/app';
-import type { UserBookWithId } from './types/books.types';
 
 const firebaseConfig = {
 	apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
 	appId: import.meta.env.VITE_FIREBASE_APP_ID,
 	authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
 	projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-	useEmulator: import.meta.env.VITE_FIREBASE_USE_EMULATOR === 'true'
+	useEmulator: import.meta.env.VITE_FIREBASE_USE_EMULATOR === 'false'
 };
 
 export let app: FirebaseApp;
@@ -35,7 +34,7 @@ export const initializeFirebase = async () => {
 	}
 };
 
-const createCollection = async <T = DocumentData>(collectionName: string) => {
+export const getUserLibraryCollection = async (userId: string) => {
 	await initializeFirebase();
 
 	if (!db) {
@@ -43,9 +42,6 @@ const createCollection = async <T = DocumentData>(collectionName: string) => {
 		return undefined;
 	}
 
-	return collection(db, collectionName) as CollectionReference<T>;
-};
-
-export const getBookCollection = async () => {
-	return await createCollection<UserBookWithId>('books');
-};
+	const userDoc = doc(db, 'users', userId);
+	return collection(userDoc, 'library');
+}

@@ -1,6 +1,7 @@
 <script lang="ts">
-	import { auth } from '$lib/firebase.client';
+	import { auth, db } from '$lib/firebase.client';
 	import { createUserWithEmailAndPassword } from 'firebase/auth';
+	import { doc, setDoc } from 'firebase/firestore';
 	import { goto } from '$app/navigation';
 	import { session } from '$lib/session';
 
@@ -8,22 +9,33 @@
 	let password: string = '';
 
 	async function handleRegister() {
-		await createUserWithEmailAndPassword(auth, email, password)
-			.then((result) => {
-				const { user } = result;
-				session.update((cur: any) => {
-					return {
-						...cur,
-						user,
-						loggedIn: true,
-						loading: false
-					};
+
+		try {
+			const result = await createUserWithEmailAndPassword(auth, email, password);
+			const { user } = result;
+
+			if (db) {
+				const userDocRef = doc(db, 'users', user.uid);
+				await setDoc(userDocRef, {
+					uid: user.uid,
+					email: user.email,
 				});
-				goto('/');
-			})
-			.catch((error) => {
-				throw new Error(error);
+			}
+
+			session.update((cur: any) => {
+				return {
+					...cur,
+					user,
+					loggedIn: true,
+					loading: false
+				};
 			});
+
+			goto('/');
+		}
+		catch (error) {
+			console.log('error', error);
+		}
 	}
 </script>
 

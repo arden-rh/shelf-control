@@ -1,4 +1,4 @@
-export interface UserBook {
+export interface LibraryBook {
     title: string;
     authors: string[];
     publisher?: string;
@@ -12,12 +12,13 @@ export interface UserBook {
     };
     language?: string;
     canonicalVolumeLink?: string;
+    bookShelves?: string[];
     userId: string;
 }
 
-export interface UserBookWithId extends UserBook { _id: string; }
+export interface LibraryBookWithId extends LibraryBook { _id: string; }
 
-export interface UserBookWithoutUserId extends Omit<UserBook, 'userId'> {}
+export interface LibraryBookWithoutUserId extends Omit<LibraryBook, 'userId'> {}
 
 export interface Book {
 	id: string;
