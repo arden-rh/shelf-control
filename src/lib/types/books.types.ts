@@ -1,24 +1,29 @@
+export interface UserBook {
+    title: string;
+    authors: string[];
+    publisher?: string;
+    publishedDate?: string;
+    description?: string;
+    pageCount?: number;
+    categories?: string[];
+    imageLinks?: {
+        smallThumbnail?: string;
+        thumbnail?: string;
+    };
+    language?: string;
+    canonicalVolumeLink?: string;
+    userId: string;
+}
+
+export interface UserBookWithId extends UserBook { _id: string; }
+
+export interface UserBookWithoutUserId extends Omit<UserBook, 'userId'> {}
+
 export interface Book {
 	id: string;
     etag: string;
     selfLink: string;
 	volumeInfo: VolumeInfo;
-    // accessInfo: {
-    //     country: string;
-    //     viewability: string;
-    //     embeddable: boolean;
-    //     publicDomain: boolean;
-    //     textToSpeechPermission: string;
-    //     epub: {
-    //         isAvailable: boolean;
-    //         acsTokenLink: string;
-    //     };
-    //     pdf: {
-    //         isAvailable: boolean;
-    //         acsTokenLink: string;
-    //     };
-    //     webReaderLink: string;
-    // };
     searchInfo: {
         textSnippet: string;
     };
@@ -29,7 +34,7 @@ export interface BooksResponse {
 	items: Book[];
 }
 
-type VolumeInfo = {
+export interface VolumeInfo {
     title: string;
     authors: string[];
     publisher: string;
@@ -46,8 +51,8 @@ type VolumeInfo = {
     pageCount: number;
     printType: string;
     categories: string[];
-    // averageRating: number;
-    // ratingsCount: number;
+    averageRating: number;
+    ratingsCount: number;
     maturityRating: string;
     panelizationSummary: {
         containsEpubBubbles: boolean;

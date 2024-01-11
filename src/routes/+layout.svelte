@@ -17,7 +17,8 @@
 	import { QueryClient, QueryClientProvider } from '@sveltestack/svelte-query';
 	import { session } from '$lib/session';
 	import { signOut } from 'firebase/auth';
-	import type { SessionState, User } from '$lib/session';
+	import type { SessionState } from '$lib/session';
+	import type { User } from '$lib/types/user.types';
 
 	import type { LayoutData } from './$types';
 	export let data: LayoutData;
@@ -58,7 +59,7 @@
 		{:else}
 			<div>
 				Logged in: {loggedIn}
-				<slot name='nav' />
+				<slot name="nav" />
 			</div>
 		{/if}
 	</nav>
