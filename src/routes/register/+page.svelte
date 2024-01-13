@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { auth, db } from '$lib/firebase.client';
+	import { auth, db } from '$lib/firebase/firebase.client';
 	import { createUserWithEmailAndPassword } from 'firebase/auth';
 	import { doc, setDoc } from 'firebase/firestore';
 	import { goto } from '$app/navigation';

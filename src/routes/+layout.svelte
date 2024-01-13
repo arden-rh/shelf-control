@@ -10,7 +10,7 @@
 
 <script lang="ts">
 	import '../app.pcss';
-	import { auth } from '$lib/firebase.client';
+	import { auth } from '$lib/firebase/firebase.client';
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';

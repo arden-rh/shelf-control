@@ -2,7 +2,7 @@
 
 import { browser } from '$app/environment';
 import { onAuthStateChanged } from 'firebase/auth';
-import { initializeFirebase, auth } from '$lib/firebase.client';
+import { initializeFirebase, auth } from '$lib/firebase/firebase.client';
 
 export async function load({ url }) {
 	if (browser) {

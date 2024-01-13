@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { session } from '$lib/session';
-	import { auth } from '$lib/firebase.client';
+	import { auth } from '$lib/firebase/firebase.client';
 	import {
 		GoogleAuthProvider,
 		signInWithPopup,

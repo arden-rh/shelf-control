@@ -1,7 +1,7 @@
-import type { UserBookWithoutUserId } from "$lib/types/books.types";
+import type { LibraryBookWithoutUserId } from "$lib/types/books.types";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function toUserBook(source: any): UserBookWithoutUserId {
+export function toUserBook(source: any): LibraryBookWithoutUserId {
     return {
         title: source.title,
         authors: source.authors,
