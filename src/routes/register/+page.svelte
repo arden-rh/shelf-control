@@ -9,7 +9,6 @@
 	let password: string = '';
 
 	async function handleRegister() {
-
 		try {
 			const result = await createUserWithEmailAndPassword(auth, email, password);
 			const { user } = result;
@@ -18,22 +17,23 @@
 				const userDocRef = doc(db, 'users', user.uid);
 				await setDoc(userDocRef, {
 					uid: user.uid,
-					email: user.email,
+					email: user.email
 				});
 			}
 
-			session.update((cur: any) => {
-				return {
-					...cur,
-					user,
-					loggedIn: true,
-					loading: false
-				};
+			session.set({
+				loading: false,
+				loggedIn: true,
+				user: {
+					displayName: user?.displayName,
+					email: user?.email,
+					photoURL: user?.photoURL,
+					uid: user?.uid
+				}
 			});
 
 			goto('/');
-		}
-		catch (error) {
+		} catch (error) {
 			console.log('error', error);
 		}
 	}

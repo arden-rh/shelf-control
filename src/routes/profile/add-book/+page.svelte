@@ -6,7 +6,7 @@
 	import { FirebaseError } from '@firebase/util';
 	import { get, writable } from 'svelte/store';
 	import { goto } from '$app/navigation';
-	import { toUserBook } from '$lib/utility/toUserBook';
+	import { toLibraryBook } from '$lib/utility/toLibraryBook';
 	import { useQuery } from '@sveltestack/svelte-query';
 	import type { LibraryBook, VolumeInfo } from '$lib/types/books.types';
 	import type { PageData } from './$types';
@@ -30,7 +30,7 @@
 
 		const selectedBookValue = get(selectedBook);
 
-		const bookValue = toUserBook(selectedBookValue)
+		const bookValue = toLibraryBook(selectedBookValue)
 
 		const book: LibraryBook = {
 			...bookValue,
