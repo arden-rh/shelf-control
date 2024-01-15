@@ -26,7 +26,6 @@
 						uid: user?.uid
 					}
 				});
-                console.log(session);
 				goto('/');
 			})
 			.catch((error) => {

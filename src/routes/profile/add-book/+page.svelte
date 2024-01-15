@@ -26,15 +26,14 @@
 		selectedBook.set(book);
 	}
 
-	async function addBook () {
-
+	async function addBook() {
 		const selectedBookValue = get(selectedBook);
 
-		const bookValue = toLibraryBook(selectedBookValue)
+		const bookValue = toLibraryBook(selectedBookValue);
 
 		const book: LibraryBook = {
 			...bookValue,
-			userId: testUserId,
+			userId: testUserId
 		};
 
 		const userId = testUserId;
@@ -59,8 +58,8 @@
 	// );
 </script>
 
-<div>
-	<h1>Books</h1>
+<section>
+	<h1 class="page-header">Add a book to your library</h1>
 	<!-- {#if $queryResult.status === 'loading'}
 		<div>Loading...</div>
 	{:else if $queryResult.error instanceof Error}
@@ -68,13 +67,16 @@
 	{:else if $queryResult.status === 'success'}
 		<div>Success!</div>
 	{/if} -->
-	<form data-sveltekit-keepfocus action="/profile/add-book" method="get">
-		<label>
-			Search:
-			<input type="text" name="q" bind:value={$q} />
-			<button type="submit">Search</button>
-		</label>
-	</form>
+	<div class="add-book-form">
+		<h2>Search for a book</h2>
+		<form data-sveltekit-keepfocus action="/profile/add-book" method="get">
+			<label>
+				<input type="text" name="q" bind:value={$q} aria-label="Search for a book" />
+				<button type="submit">Search</button>
+			</label>
+		</form>
+	</div>
+
 	<!-- {#if $queryResult.status === 'success' && $queryResult.data}
 		<ul>
 			{#each $queryResult.data.items as book}
@@ -87,16 +89,29 @@
 	{#if data}
 		{#if data.status === 200}
 			{#if data.props.data.items}
-				<ul>
+				<ul class="book-list">
 					{#each data.props.data.items as book}
-						<li>
-							<!-- {book.volumeInfo.title} <button class="border" use:melt={$trigger}>Read more</button> -->
-							{book.volumeInfo.title}
+						<li class="book-list-item mb-3 flex">
 							<button
-								class="border"
 								on:click={() => openDialog(book.volumeInfo)}
-								use:melt={$trigger}>Read more</button
+								use:melt={$trigger}
+								class="book-list-item-button flex flex-row items-center gap-5 px-3"
 							>
+								<!-- {book.volumeInfo.title} <button class="border" use:melt={$trigger}>Read more</button> -->
+								{#if book.volumeInfo.imageLinks?.thumbnail}
+									<img
+										src={book.volumeInfo.imageLinks.thumbnail}
+										alt={book.volumeInfo.title}
+										class="max-h-36 object-cover object-center"
+									/>
+								{:else}
+									<div class="placeholder-thumbnail max-h-36">Cover Missing</div>
+								{/if}
+								<h3>{book.volumeInfo.title}</h3>
+								<!-- <button class="" on:click={() => openDialog(book.volumeInfo)} use:melt={$trigger}
+									>Read more</button
+								> -->
+							</button>
 						</li>
 					{/each}
 				</ul>
@@ -107,7 +122,7 @@
 			<div>Server error</div>
 		{/if}
 	{:else}
-		<div class="bg-red">Loading...</div>
+		<div class="">Loading...</div>
 	{/if}
 
 	<div use:melt={$portalled}>
@@ -119,13 +134,93 @@
             p-6 shadow-lg"
 				use:melt={$content}
 			>
-				<h2 use:melt={$title}>{$selectedBook.title}</h2>
+				<div class="flex flex-row justify-between">
+					<h2 use:melt={$title}>{$selectedBook.title}</h2>
+					<button use:melt={$close}>Close Dialog</button>
+				</div>
 				{#if $selectedBook.description}
 					<p use:melt={$description}>{$selectedBook.description}</p>
 				{/if}
-				<button use:melt={$close}>Close Dialog</button>
-				<button on:click={() => addBook()}>Add book</button>
+				<button class="hover:bg-black" on:click={() => addBook()}>Add book</button>
 			</div>
 		{/if}
 	</div>
-</div>
+</section>
+
+<style>
+	/* @import '/src/app.pcss'; */
+
+	.add-book-form {
+		display: flex;
+		flex-direction: column;
+		margin-bottom: 2rem;
+	}
+
+	.add-book-form form label {
+		display: flex;
+		gap: 0.75rem;
+	}
+
+	.add-book-form label button {
+		background-color: var(--primary-color);
+		border: 2px solid var(--primary-color);
+		color: var(--primary-white);
+		border-radius: 5px;
+		padding: 0.5rem 1rem;
+	}
+
+	.add-book-form label button:hover {
+		background-color: var(--secondary-color);
+		color: var(--primary-color);
+	}
+
+	.add-book-form label input {
+		border: 2px solid var(--primary-color);
+		border-radius: 5px;
+		padding: 0.5rem;
+		width: 100%;
+	}
+
+	.book-list {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+	}
+
+	.book-list-item {
+		background-color: var(--secondary-color);
+		border-radius: 5px;
+	}
+
+	.book-list-item:nth-child(even) {
+		background-color: var(--primary-white);
+	}
+
+	.book-list-item-button {
+		width: 100%;
+		padding: 1rem;
+	}
+
+	.book-list-item:hover {
+		background-color: var(--primary-color);
+		color: var(--primary-white);
+	}
+
+	.placeholder-thumbnail {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 100px;
+		/* height: [Your Thumbnail Height] */
+		height: 308px;
+		background-color: var(--secondary-color); 
+		color: var(--primary-color);
+		font-size: 1rem;
+	}
+
+	@media (min-width: 768px) {
+		.add-book-form label input {
+			max-width: 50%;
+		}
+	}
+</style>

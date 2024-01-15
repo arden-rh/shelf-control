@@ -1,8 +1,8 @@
 import { doc, setDoc } from 'firebase/firestore';
 import { FirebaseError } from '@firebase/util';
-import type { LibraryBook } from '$lib/types/books.types';
 import { getUserLibraryCollection } from '$lib/firebase/firebase.client';
 import { writable } from 'svelte/store';
+import type { LibraryBook } from '$lib/types/books.types';
 
 export const errorMsg = writable<string | null>(null);
 export const error = writable<boolean>(false);

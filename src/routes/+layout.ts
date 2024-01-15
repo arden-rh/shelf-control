@@ -8,6 +8,7 @@ export async function load({ url }) {
 	if (browser) {
 		try {
 			initializeFirebase();
+			console.log('Firebase initialized');
 		} catch (ex) {
 			console.error(ex);
 		}
@@ -18,6 +19,7 @@ export async function load({ url }) {
 			onAuthStateChanged(auth, (user) => {
 				resolve(user ? user : false);
 			});
+			console.log('Auth state changed');
 		});
 	}
 
