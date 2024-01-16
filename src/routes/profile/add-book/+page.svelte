@@ -68,7 +68,9 @@
 </script>
 
 <section>
-	<h1 class="page-header">Add a book to your library</h1>
+	<div class="page-header">
+		<h1>Add a book</h1>
+	</div>
 	<div class="add-book-form">
 		<h2>Search for a book</h2>
 		<form data-sveltekit-keepfocus action="/profile/add-book" method="get">
@@ -206,14 +208,15 @@
 		height: 50px;
 	}
 
+	h1 {
+		padding: 0 0.8rem 0 1.25rem;
+	}
+
 	h2 {
 		font-size: 1.2rem;
-		font-weight: 600;
 		letter-spacing: 0.025rem;
-		color: var(--primary-color);
-		font-family: var(--header-font);
-		text-transform: uppercase;
 	}
+
 
 	h3 {
 		font-size: 1rem;
@@ -285,6 +288,10 @@
 	.book-list-item-button {
 		width: 100%;
 		padding: 1rem;
+	}
+
+	.button {
+		height: 2.75rem;
 	}
 
 	.close-button {

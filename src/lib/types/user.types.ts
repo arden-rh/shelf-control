@@ -10,4 +10,9 @@ export interface LoggedInUser {
 export interface User extends LoggedInUser {
 	libary?: LibraryBookWithId[];
 	allBookShelves?: string[];
+	privateInfo?: {
+		profilePicture?: 'all' | 'users' | 'none';
+		favorites?: 'all' | 'users' | 'none';
+		bookShelves?: 'all' | 'users' | 'none';
+	}
 }

@@ -9,11 +9,58 @@ button {
 	cursor: pointer;
 }
 
+h1, h2, h3 {
+    font-family: var(--header-font);
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
 h1 {
-	color: var(--primary-color);
 	font-size: 3rem;
-	font-family: var(--header-font);
-	font-weight: 600;
+    margin: 1.5rem 0 2rem;
+    padding: 0 0.8rem 0.25rem 1.25rem;
+    border-right: 10px solid var(--secondary-color);
+    border-bottom: 10px solid var(--secondary-color);
+    text-align: end;
+    text-transform: lowercase;
+    align-self: flex-end;
+    box-shadow: inset -4px -4px 0px 0px rgba(178, 152, 220, 1);
+    width: 100%;
+    position: relative;
+}
+
+h1::before {
+    content: '';
+    position: absolute;
+    background-color: var(--accent-purple);
+    left: -4px;
+    bottom: -10px;
+    width: 4px;
+    height: 10px;
+    transform-origin: top right;
+    transform: skewY(42deg);
+    z-index: 1;
+}
+
+h1::after {
+    content: '';
+    position: absolute;
+    background-color: var(--accent-purple);
+    left: -4px;
+    bottom: 0;
+    width: 4px;
+    height: 4px;
+    z-index: 1;
+}
+
+h2 {
+    font-size: 2rem;
+    text-transform: uppercase;
+}
+
+h3 {
+    font-size: 1rem;
+    text-transform: uppercase;
 }
 
 section {
@@ -28,10 +75,11 @@ section {
 	align-items: center;
 	border-radius: 5px;
 	font-family: var(--header-font);
+    font-size: 0.9rem;
     display: flex;
-	height: 2.75rem;
+	height: 2.25rem;
 	letter-spacing: 0.075rem;
-	padding: 0 1rem;
+	padding: 0 0.75rem;
 	text-transform: uppercase;
 }
 
@@ -61,11 +109,42 @@ section {
 }
 
 .page-header {
-	color: var(--primary-color);
-	margin: 1rem 0;
+    width: 100%;
+    position: relative;
+    align-self: flex-end;
+}
+
+.page-header::before {
+    content: '';
+    position: absolute;
+    background-color: var(--accent-purple);
+    top: 20px;
+    right: 4px;
+    width: 10px;
+    height: 4px;
+    transform-origin: top left;
+    transform: skewX(48deg);
+    z-index: 1;
+}
+
+.page-header::after {
+    content: '';
+    position: absolute;
+    background-color: var(--accent-purple);
+    top: 20px;
+    right: 8px;
+    width: 6px;
+    height: 4px;
+    z-index: 2;
 }
 
 @media (min-width: 768px) {
+
+    h1 {
+        width: fit-content;
+        font-size: 4rem;
+    }
+    
 	section {
 		padding: 0 2rem;
 	}
