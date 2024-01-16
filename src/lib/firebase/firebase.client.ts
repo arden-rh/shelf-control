@@ -16,6 +16,7 @@ import type { Auth } from 'firebase/auth';
 import type { Firestore } from 'firebase/firestore';
 import type { FirebaseApp } from 'firebase/app';
 import type { LibraryBookWithId } from '$lib/types/books.types';
+import type { AppUser } from '$lib/types/user.types';
 
 const firebaseConfig = {
 	apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -45,6 +46,25 @@ export const initializeFirebase = async () => {
 	}
 };
 
+export const getUser = async (userId: string) => {
+	try {
+		await initializeFirebase();
+
+		if (!db) {
+			console.warn('Firestore is not initialized');
+			return undefined;
+		}
+
+		const userDocRef = doc(db, 'users', userId);
+		const userDocSnapshot = await getDoc(userDocRef);
+
+		return userDocSnapshot.exists() ? (userDocSnapshot.data() as AppUser) : undefined;
+	} catch (error) {
+		console.error('Error getting user:', error);
+		return undefined;
+	}
+};
+
 /** Get User's Library Collection */
 export const getUserLibraryCollection = async (userId: string) => {
 	await initializeFirebase();
@@ -54,8 +74,8 @@ export const getUserLibraryCollection = async (userId: string) => {
 		return undefined;
 	}
 
-	const userDoc = doc(db, 'users', userId);
-	return collection(userDoc, 'library');
+	const userDocRef = doc(db, 'users', userId);
+	return collection(userDocRef, 'library');
 };
 
 /** Get One Library Book */
@@ -106,42 +126,43 @@ export const getUserBookShelves = async (userId: string) => {
 
 	const userDocRef = doc(db, 'users', userId);
 
-    try {
-        const userDocSnapshot = await getDoc(userDocRef);
-        if (userDocSnapshot.exists()) {
-            const userData = userDocSnapshot.data();
-            return userData.allBookShelves || [];
-        } else {
-            console.log('User document not found');
-            return [];
-        }
-    } catch (error) {
-        console.error('Error fetching user bookshelves:', error);
-        throw error; 
-    }
+	try {
+		const userDocSnapshot = await getDoc(userDocRef);
+		if (userDocSnapshot.exists()) {
+			const userData = userDocSnapshot.data();
+			return userData.allBookShelves || [];
+		} else {
+			console.log('User document not found');
+			return [];
+		}
+	} catch (error) {
+		console.error('Error fetching user bookshelves:', error);
+		throw error;
+	}
 };
 
+/** Get all Books with the same 'bookshelf' tag */
 export const getBooksByBookshelf = async (userId: string, bookshelf: string) => {
-    await initializeFirebase();
+	await initializeFirebase();
 
-    if (!db) {
-        console.warn('Firestore is not initialized');
-        return undefined;
-    }
+	if (!db) {
+		console.warn('Firestore is not initialized');
+		return undefined;
+	}
 
-    try {
-        const userLibraryRef = collection(db, 'users', userId, 'library');
-        const q = query(userLibraryRef, where('bookShelves', 'array-contains', bookshelf));
-        const querySnapshot = await getDocs(q);
+	try {
+		const userLibraryRef = collection(db, 'users', userId, 'library');
+		const q = query(userLibraryRef, where('bookShelves', 'array-contains', bookshelf));
+		const querySnapshot = await getDocs(q);
 
-        return querySnapshot.docs.map(doc => ({
-            ...doc.data(),
-            _id: doc.id // Assuming you want to keep the document ID
-        }));
-    } catch (error) {
-        console.error('Error fetching books for user:', error);
-        return [];
-    }
+		return querySnapshot.docs.map((doc) => ({
+			...doc.data(),
+			_id: doc.id // Assuming you want to keep the document ID
+		}));
+	} catch (error) {
+		console.error('Error fetching books for user:', error);
+		return [];
+	}
 };
 
 /**

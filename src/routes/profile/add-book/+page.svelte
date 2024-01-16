@@ -1,25 +1,21 @@
 <script lang="ts">
 	import { createBook } from '$lib/hooks/createLibraryBook.client';
 	import { createDialog, melt } from '@melt-ui/svelte';
-	import { doc, setDoc } from 'firebase/firestore';
 	import { faRectangleXmark } from '@fortawesome/free-solid-svg-icons';
 	import { fetchGoogleBooks } from '$lib/queries/books';
-	import { FirebaseError } from '@firebase/util';
 	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
 	import { get, writable } from 'svelte/store';
 	import { goto } from '$app/navigation';
 	import { toLibraryBook } from '$lib/utility/toLibraryBook';
 	import { useQuery } from '@sveltestack/svelte-query';
-	import { session } from '$lib/session';
+	import { session } from '$lib/stores/session';
 	import type { LibraryBook, VolumeInfo } from '$lib/types/books.types';
 	import type { PageData } from './$types';
 	import type { SessionState } from '$lib/types/session.types';
-	import { onMount } from 'svelte';
 	import type { LoggedInUser } from '$lib/types/user.types';
 
 	const q = writable('');
 	const selectedBook = writable({} as VolumeInfo);
-	// const testUserId = 'jB9gd9zwX8gP9Dcosxz3';
 	let loggedIn: boolean = false;
 	let user: LoggedInUser | null = null;
 
@@ -60,7 +56,7 @@
 		if (response?.success) {
 			console.log('Book added successfully:');
 
-			goto(`/profile/library/${response.bookId}`);		
+			goto(`/profile/library?bookId=${response.bookId}`);		
 		} else {
 			console.error('Failed to add book:', response?.error);
 		}
@@ -222,6 +218,7 @@
 		font-size: 1rem;
 		line-height: 1.25rem;
 		margin-bottom: 0.25rem;
+		color: var(--primary-black);
 	}
 
 	h4 {

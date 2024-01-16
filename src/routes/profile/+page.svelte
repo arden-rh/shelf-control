@@ -1,7 +1,38 @@
 <script lang="ts">
-	let userId = 'user-id';
-	let bookId = 'book-id';
+	import { faRectangleXmark } from '@fortawesome/free-solid-svg-icons';
+	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
+	import { createDialog, melt } from '@melt-ui/svelte';
+	import { goto } from '$app/navigation';
+	import { session } from '$lib/stores/session';
+	import { userStore } from '$lib/stores/user';
+	import { writable } from 'svelte/store';
+	import type { LibraryBookWithId } from '$lib/types/books.types';
+	import type { AppUser, LoggedInUser } from '$lib/types/user.types';
+	import type { SessionState } from '$lib/types/session.types';
+
 	let newBookShelves = ['Fantasy', 'Bestsellers'];
+	let favouriteShelf = writable('');
+	const selectedBook = writable({} as LibraryBookWithId);
+	let books: LibraryBookWithId[] = [];
+	let user: LoggedInUser | null = null;
+	let appUser: AppUser | null = null;
+
+	const {
+		elements: { trigger, portalled, overlay, content, title, description, close },
+		states: { open }
+	} = createDialog();
+
+	session.subscribe((current: SessionState) => {
+		user = current?.user;
+	});
+
+	userStore.subscribe((current: AppUser) => {
+		appUser = current;
+	});
+
+	function openBook(book: LibraryBookWithId) {
+		selectedBook.set(book);
+	}
 </script>
 
 <section>
@@ -20,17 +51,38 @@
 			</div>
 			<div class="profile-details">
 				<ul>
-					<li>Display name:</li>
-					<li>Favourite book:</li>
-					<li>Favourite genre:</li>
-					<li>Favourite author:</li>
+					{#if appUser}
+						<li>
+							<span>Display name:</span>{appUser.displayName ? appUser.displayName : 'Not chosen'}
+						</li>
+						{#if appUser.favouriteBook}
+							<li>
+								<span>Favourite book:</span>{appUser.favouriteBook}
+							</li>
+						{/if}
+						{#if appUser.favouriteAuthor}
+							<li>
+								<span>Favourite author:</span>{appUser.favouriteAuthor}
+							</li>
+						{/if}
+						{#if appUser.favouriteGenre}
+							<li>
+								<span>Favourite genre:</span>{appUser.favouriteGenre}
+							</li>
+						{/if}
+					{/if}
 				</ul>
 			</div>
 		</section>
 		<section class="bookshelves">
 			<h2>Bookshelves</h2>
+			<h3>Favourite shelf</h3>
 			<div class="bookshelves-container">
-				<h3>Favourite shelf</h3>
+				{#each books as book}
+					<button class="book">
+						<h4>{book.title}</h4>
+					</button>
+				{/each}
 			</div>
 		</section>
 	</div>
@@ -47,9 +99,14 @@
 	li {
 		font-family: var(--header-font);
 		font-size: 1rem;
-		font-weight: 600;
 		letter-spacing: 0.05rem;
+	}
+
+	li span {
+		font-weight: 600;
+		display: block;
 		text-transform: uppercase;
+		line-height: 1.25rem;
 	}
 
 	h1::before {
@@ -75,38 +132,12 @@
 		height: 4px;
 		z-index: 1;
 	}
-
-    .page-header {
-        width: 100%;
-        position: relative;
-        align-self: flex-end;
-    }
-
-    .page-header::before {
-        content: '';
-        position: absolute;
-        background-color: var(--accent-purple);
-		top: 20px;
-		right: 4px;
-		width: 10px;
-		height: 4px;
-		transform-origin: top left;
-		transform: skewX(48deg);
-        z-index: 1;
-    }
-
-    .page-header::after {
-        content: '';
-        position: absolute;
-        background-color: var(--accent-purple);
-		top: 20px;
-		right: 8px;
-		width: 6px;
-		height: 4px;
-        z-index: 2;
-    }
-
 	h2 {
+		margin-bottom: 0.5rem;
+		line-height: 1.75rem;
+	}
+
+	h3 {
 		margin-bottom: 0.5rem;
 	}
 
@@ -124,13 +155,12 @@
 		flex-direction: row;
 		align-items: center;
 		justify-content: flex-start;
-		width: 100%;
-		padding: 0;
-		position: relative;
+		width: 98%;
 		border: 12px solid var(--secondary-color);
 		box-shadow: inset -8px -8px 0px 0px rgba(178, 152, 220, 1);
 		position: relative;
 		padding: 0.8rem 1rem 1rem;
+		margin-left: 0.5rem;
 	}
 
 	.bookshelves-container::before,
@@ -240,22 +270,27 @@
 		justify-content: flex-end;
 		margin-bottom: 1rem;
 		align-self: flex-end;
-		gap: 1rem;
+		background-color: var(--secondary-color);
+		border-radius: 5px;
+		overflow: hidden;
 	}
-
 	.profile-actions .button {
-		font-size: 0.75rem;
+		font-size: 0.7rem;
 		height: fit-content;
 		padding: 0.5rem 1rem;
+		border-radius: 0;
+		background-color: var(--accent-purple);
+		border: none;
+		color: var(--primary-color);
 	}
 
-	@media (min-width: 768px) {
-		.profile-actions {
-			margin-bottom: 0.75rem;
-		}
+	.profile-actions .button:nth-child(2) {
+		border-left: 1px solid var(--primary-grey);
+		border-right: 1px solid var(--primary-grey);
+	}
 
-        .page-header {
-            width: fit-content;
-        }
+	.profile-actions .button:hover {
+		background-color: var(--primary-color);
+		color: var(--primary-white);
 	}
 </style>

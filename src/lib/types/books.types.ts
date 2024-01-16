@@ -10,9 +10,13 @@ export interface LibraryBook {
         smallThumbnail?: string;
         thumbnail?: string;
     };
+    industryIdentifiers: {
+        type: string;
+        identifier: string;
+    }[];
     language?: string;
     canonicalVolumeLink?: string;
-    bookShelves?: string[];
+    bookshelves?: string[];
     userId: string;
 }
 

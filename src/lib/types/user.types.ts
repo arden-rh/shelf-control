@@ -7,9 +7,13 @@ export interface LoggedInUser {
 	uid?: string | null;
 };
 
-export interface User extends LoggedInUser {
-	libary?: LibraryBookWithId[];
+export interface AppUser extends LoggedInUser {
+	library?: LibraryBookWithId[];
 	allBookShelves?: string[];
+	favouriteShelf?: string;
+	favouriteBook?: string;
+	favouriteAuthor?: string;
+	favouriteGenre?: string;
 	privateInfo?: {
 		profilePicture?: 'all' | 'users' | 'none';
 		favorites?: 'all' | 'users' | 'none';

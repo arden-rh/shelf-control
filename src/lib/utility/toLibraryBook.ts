@@ -11,6 +11,7 @@ export function toLibraryBook(source: any): LibraryBookWithoutUserId {
         pageCount: source.pageCount,
         categories: source.categories,
         imageLinks: source.imageLinks,
+        industryIdentifiers: source.industryIdentifiers,
         language: source.language,
         canonicalVolumeLink: source.canonicalVolumeLink,
     };

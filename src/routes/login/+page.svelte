@@ -1,6 +1,7 @@
 <script lang="ts">
-	import { session } from '$lib/session';
-	import { auth } from '$lib/firebase/firebase.client';
+	import { session } from '$lib/stores/session';
+	import { userStore } from '$lib/stores/user';
+	import { auth, getUser } from '$lib/firebase/firebase.client';
 	import {
 		GoogleAuthProvider,
 		signInWithPopup,
@@ -13,47 +14,37 @@
 	let password: string = '';
 
 	async function loginWithMail() {
-		await signInWithEmailAndPassword(auth, email, password)
-			.then((result) => {
-				const { user }: UserCredential = result;
+		try {
+			const result = await signInWithEmailAndPassword(auth, email, password);
+			const { user }: UserCredential = result;
+
+			if (!user) {
+				return;
+			}
+
+			try {
+				const appUser = await getUser(user.uid);
+
+				if (!appUser) {
+					return;
+				}
+
 				session.set({
-                    loading: false,
+					loading: false,
 					loggedIn: true,
-					user: {
-						displayName: user?.displayName,
-						email: user?.email,
-						photoURL: user?.photoURL,
-						uid: user?.uid
-					}
+					user: appUser
 				});
+
+				userStore.set(appUser);
+
 				goto('/profile');
-			})
-			.catch((error) => {
-				return error;
-			});
+			} catch (error) {
+				console.error(error);
+			}
+		} catch (error) {
+			console.error(error);
+		}
 	}
-
-	// async function loginWithGoogle() {
-	// 	const provider = new GoogleAuthProvider();
-	// 	await signInWithPopup(auth, provider)
-	// 		.then((result) => {
-	// 			const { displayName, email, photoURL, uid } = result?.user;
-	// 			session.set({
-	// 				loggedIn: true,
-	// 				user: {
-	// 					displayName,
-	// 					email,
-	// 					photoURL,
-	// 					uid
-	// 				}
-	// 			});
-
-	// 			goto('/');
-	// 		})
-	// 		.catch((error) => {
-	// 			return error;
-	// 		});
-	// }
 </script>
 
 <div class="login-form">

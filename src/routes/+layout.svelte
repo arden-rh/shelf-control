@@ -1,30 +1,22 @@
-<script context="module" lang="ts">
-	export const queryClient = new QueryClient({
-		defaultOptions: {
-			queries: {
-				enabled: browser
-			}
-		}
-	});
-</script>
-
 <script lang="ts">
-	import { auth } from '$lib/firebase/firebase.client';
+	import { app, auth } from '$lib/firebase/firebase.client';
 	import { browser } from '$app/environment';
+	import { createDropdownMenu, melt } from '@melt-ui/svelte';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { QueryClient, QueryClientProvider } from '@sveltestack/svelte-query';
-	import { session } from '$lib/session';
+	import { session } from '$lib/stores/session';
 	import { signOut } from 'firebase/auth';
+	import type { AppUser } from '$lib/types/user.types';
 	import type { SessionState } from '$lib/types/session.types';
-	import { createDropdownMenu, melt } from '@melt-ui/svelte';
-	import type { User } from '$lib/types/user.types';
-
 	import type { LayoutData } from './$types';
+	import { userStore } from '$lib/stores/user';
+
 	export let data: LayoutData;
 
 	let loading: boolean = true;
 	let loggedIn: boolean = false;
+	let appUser: AppUser | null = null;
 
 	const {
 		elements: { trigger, menu, item, separator, arrow },
@@ -40,20 +32,37 @@
 		loggedIn = current?.loggedIn;
 	});
 
+	userStore.subscribe((current: AppUser) => {
+		if (current) {
+			appUser = current;
+		}
+	});
+
 	onMount(async () => {
 		const user: any = await data.getAuthUser();
 
 		const loggedIn = !!user;
 
-		session.update((current: SessionState) => {
+		try {
+			session.update((current: SessionState) => {
+				return {
+					...current,
+					user,
+					loggedIn,
+					loading: false
+				};
+			});
+
+			userStore.update((current) => {
+				return {
+					...current,
+					...user
+				};
+			});
 			loading = false;
-			return {
-				...current,
-				user,
-				loggedIn,
-				loading: false
-			};
-		});
+		} catch (error) {
+			console.error('Error fetching user:', error);
+		}
 
 		if (!loggedIn) {
 			goto('/login');
@@ -71,28 +80,26 @@
 	}
 </script>
 
-<QueryClientProvider client={queryClient}>
-	<div class="layout-container">
-		<nav class="flex flex-row">
-			<div class="nav-container flex flex-row justify-between">
-				<a href="/" class="logotype">shelf-control</a>
-				<div class="nav-menu">
-					{#if loading}
-						<div class="button button-secondary">Loading...</div>
-					{:else if loggedIn}
-						<a class="button button-secondary" href="/profile">Profile</a>
-						<button class="button button-secondary" on:click={handleLogout}>Logout</button>
-					{:else}
+<div class="layout-container">
+	<nav class="flex flex-row">
+		<div class="nav-container flex flex-row justify-between">
+			<a href="/" class="logotype">shelf-control</a>
+			<div class="nav-menu">
+				{#if loading}
+					<div class="button button-secondary">Loading...</div>
+				{:else if loggedIn}
+					<a class="button button-secondary" href="/profile">Profile</a>
+					<button class="button button-secondary" on:click={handleLogout}>Logout</button>
+				{:else}
 					<a class="button button-secondary" href="/login">Login</a>
-					{/if}
-				</div>
+				{/if}
 			</div>
-		</nav>
-		<main class="main-container">
-			<slot />
-		</main>
-	</div>
-</QueryClientProvider>
+		</div>
+	</nav>
+	<main class="main-container">
+		<slot />
+	</main>
+</div>
 
 <style>
 	@import '../app.pcss';

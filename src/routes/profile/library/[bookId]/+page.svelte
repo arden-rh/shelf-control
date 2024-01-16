@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getUserLibraryBook } from '$lib/firebase/firebase.client';
 	import { onMount } from 'svelte';
-	import { session } from '$lib/session';
+	import { session } from '$lib/stores/session';
 	import { page } from '$app/stores';
 	import type { LoggedInUser } from '$lib/types/user.types';
 	import type { SessionState } from '$lib/types/session.types';
