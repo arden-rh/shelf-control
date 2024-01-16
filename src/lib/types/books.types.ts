@@ -1,6 +1,6 @@
 export interface LibraryBook {
     title: string;
-    authors: string[];
+    authors?: string[];
     publisher?: string;
     publishedDate?: string;
     description?: string;

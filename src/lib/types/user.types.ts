@@ -8,6 +8,6 @@ export interface LoggedInUser {
 };
 
 export interface User extends LoggedInUser {
-	library?: LibraryBookWithId[];
-	bookShelves?: string[];
+	libary?: LibraryBookWithId[];
+	allBookShelves?: string[];
 }

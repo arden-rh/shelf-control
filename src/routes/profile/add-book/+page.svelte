@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { createBook } from '$lib/hooks/createUserBook.client';
+	import { createBook } from '$lib/hooks/createLibraryBook.client';
 	import { createDialog, melt } from '@melt-ui/svelte';
 	import { doc, setDoc } from 'firebase/firestore';
 	import { faRectangleXmark } from '@fortawesome/free-solid-svg-icons';
@@ -10,12 +10,18 @@
 	import { goto } from '$app/navigation';
 	import { toLibraryBook } from '$lib/utility/toLibraryBook';
 	import { useQuery } from '@sveltestack/svelte-query';
+	import { session } from '$lib/session';
 	import type { LibraryBook, VolumeInfo } from '$lib/types/books.types';
 	import type { PageData } from './$types';
+	import type { SessionState } from '$lib/types/session.types';
+	import { onMount } from 'svelte';
+	import type { LoggedInUser } from '$lib/types/user.types';
 
 	const q = writable('');
 	const selectedBook = writable({} as VolumeInfo);
-	const testUserId = 'jB9gd9zwX8gP9Dcosxz3';
+	// const testUserId = 'jB9gd9zwX8gP9Dcosxz3';
+	let loggedIn: boolean = false;
+	let user: LoggedInUser | null = null;
 
 	export let data: PageData;
 
@@ -23,6 +29,11 @@
 		elements: { trigger, portalled, overlay, content, title, description, close },
 		states: { open }
 	} = createDialog();
+
+	session.subscribe((current: SessionState) => {
+		loggedIn = current?.loggedIn;
+		user = current?.user;
+	});
 
 	function openDialog(book: VolumeInfo) {
 		selectedBook.set(book);
@@ -33,31 +44,27 @@
 
 		const bookValue = toLibraryBook(selectedBookValue);
 
+		if (!user || !user.uid) {
+			return;
+		}
+
+		const userId = user.uid;
+
 		const book: LibraryBook = {
 			...bookValue,
-			userId: testUserId
+			userId
 		};
 
-		const userId = testUserId;
+		const response = await createBook(userId, book);
 
-		await createBook(userId, book);
+		if (response?.success) {
+			console.log('Book added successfully:');
+
+			goto(`/profile/library/${response.bookId}`);		
+		} else {
+			console.error('Failed to add book:', response?.error);
+		}
 	}
-
-	// const queryResult = useQuery<BooksResponse>(
-	// 	['books', $query],
-	// 	async () => {
-	// 		console.log('query', $query);
-	// 		if ($query) {
-	// 			const result = await fetchGoogleBooks($query, index);
-	// 			console.log('waiting');
-	// 			return result;
-	// 		}
-	// 		return null;
-	// 	},
-	// 	{
-	// 		enabled: $query !== ''
-	// 	}
-	// );
 </script>
 
 <section>
@@ -67,7 +74,7 @@
 		<form data-sveltekit-keepfocus action="/profile/add-book" method="get">
 			<label>
 				<input type="text" name="q" bind:value={$q} aria-label="Search for a book" />
-				<button type="submit" class="button-primary">Search</button>
+				<button type="submit" class="button button-primary">Search</button>
 			</label>
 		</form>
 	</div>
@@ -184,7 +191,7 @@
 					<p class="dialog-description" use:melt={$description}>{$selectedBook.description}</p>
 				{/if}
 				<div class="dialog-buttons">
-					<button class="button-primary" on:click={() => addBook()}>Add book</button>
+					<button class="button button-primary" on:click={() => addBook()}>Add book</button>
 					<button use:melt={$close} class="close-button">
 						<FontAwesomeIcon icon={faRectangleXmark} class="close-icon" />
 					</button>
@@ -199,16 +206,19 @@
 		height: 50px;
 	}
 
+	h2 {
+		font-size: 1.2rem;
+		font-weight: 600;
+		letter-spacing: 0.025rem;
+		color: var(--primary-color);
+		font-family: var(--header-font);
+		text-transform: uppercase;
+	}
+
 	h3 {
 		font-size: 1rem;
 		line-height: 1.25rem;
 		margin-bottom: 0.25rem;
-	}
-
-	h3 span {
-		font-weight: 700;
-		display: block;
-		letter-spacing: 0.05rem;
 	}
 
 	h4 {
@@ -217,10 +227,13 @@
 		margin-bottom: 0.25rem;
 	}
 
+	h3 span,
 	h4 span {
 		font-weight: 700;
+		letter-spacing: 0.05rem;
+		font-family: var(--header-font);
+		text-transform: uppercase;
 		display: block;
-		letter-spacing: 0.03rem;
 	}
 
 	.add-book-form {
@@ -338,12 +351,6 @@
 	.dialog-cover-info .placeholder-thumbnail {
 		width: 120px;
 		height: 180px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		background-color: var(--secondary-color);
-		color: var(--primary-color);
-		font-size: 1rem;
 	}
 
 	.dialog-description {
@@ -359,9 +366,15 @@
 		justify-content: center;
 		width: 100px;
 		height: 9rem;
-		background-color: var(--secondary-color);
+		background-color: var(--accent-purple);
 		color: var(--primary-color);
-		font-size: 1rem;
+		font-size: 1.25rem;
+		font-family: var(--header-font);
+		text-transform: uppercase;
+		letter-spacing: 0.05rem;
+		line-height: 1.5rem;
+		padding: 0 1rem;
+		text-align: center;
 	}
 
 	.thumbnail-container {

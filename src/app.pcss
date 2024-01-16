@@ -6,85 +6,98 @@
 /* Global Styles */
 
 button {
-    cursor: pointer;
+	cursor: pointer;
 }
 
 h1 {
-    color: var(--primary-color);
-    font-size: 2rem;
-    font-family: var(--header-font);
-    font-weight: 600;
-
+	color: var(--primary-color);
+	font-size: 3rem;
+	font-family: var(--header-font);
+	font-weight: 600;
 }
 
 section {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	padding: 0 1rem;
+	max-width: 1200px;
+}
+
+.button {
+	align-items: center;
+	border-radius: 5px;
+	font-family: var(--header-font);
     display: flex;
-    flex-direction: column;
-    width: 100%;
-    padding: 0 1rem;
-    max-width: 1200px;
+	height: 2.75rem;
+	letter-spacing: 0.075rem;
+	padding: 0 1rem;
+	text-transform: uppercase;
 }
 
 .button-primary {
-    display: flex;
-    background-color: var(--primary-color);
-    border: 2px solid var(--primary-color);
-    color: var(--primary-white);
-    border-radius: 5px;
-    height: 2.75rem;
-    align-items: center;
-    padding: 0 1rem;
-    letter-spacing: 0.075rem;
-    font-family: var(--header-font);
-    font-weight: 400;
-    text-transform: uppercase;
+	background-color: var(--primary-color);
+	border: 2px solid var(--primary-color);
+	color: var(--primary-white);
+	font-weight: 400;
 }
 
 .button-primary:hover {
-    background-color: var(--secondary-color);
-    border: 2px solid var(--secondary-color);
-    color: var(--primary-color);
+	background-color: var(--secondary-color);
+	border: 2px solid var(--secondary-color);
+	color: var(--primary-color);
+}
+
+.button-secondary {
+	background-color: var(--secondary-color);
+	color: var(--primary-color);
+	border: 2px solid var(--secondary-color);
+	font-weight: 600;
+}
+
+.button-secondary:hover {
+	background-color: var(--accent-purple);
+	border: 2px solid var(--accent-purple);
 }
 
 .page-header {
-    color: var(--primary-color);
-    margin: 1rem 0;
+	color: var(--primary-color);
+	margin: 1rem 0;
 }
 
 @media (min-width: 768px) {
-    section {
-        padding: 0 2rem;
-    }
+	section {
+		padding: 0 2rem;
+	}
 }
 
 /* Colour Variables */
 :root {
-    /* Colours */
-    --primary-black: #0D0D0D;
-    --primary-grey: #D2D7DF;
-    /* --primary-grey: #E8E9EB; */ /* lighter */
-    --secondary-grey: #9FA0C3;
-    --primary-white: #F2F2F2;
-    /* --primary-white: #F9F8F8; */
-    /* --primary-white: #E6E6E9; */
-    /* --primary-white: #E9FFF9; */
-    /* --primary-white: #EAEAEA; */
-    --primary-color: #34228A;
-    --secondary-color: #BEB8EB;
+	/* Colours */
+	--primary-black: #0d0d0d;
+	--primary-grey: #d2d7df;
+	/* --primary-grey: #E8E9EB; */ /* lighter */
+	--secondary-grey: #9fa0c3;
+	--primary-white: #f2f2f2;
+	/* --primary-white: #F9F8F8; */
+	/* --primary-white: #E6E6E9; */
+	/* --primary-white: #E9FFF9; */
+	/* --primary-white: #EAEAEA; */
+	--primary-color: #34228a;
+	--secondary-color: #beb8eb;
 
-    /* Fonts */
-    --header-font: 'Oswald', sans-serif;
-    --body-font: 'Merriweather', serif;
+	/* Fonts */
+	--header-font: 'Oswald', sans-serif;
+	--body-font: 'Merriweather', serif;
 
-    /* Not used atm */
-    --accent-purple: #B298DC;
-    --accent-light-blue-grey: #B8D0EB;
-    --accent-light-blue-grey: #BFD7EA; /* like this one */
-    --accent-blue-grey: #A2BCE0; /* doesn't work with #beb8eb */
-    --accent-light-grey: #C1DBE3;
-    --accent-light-blue: #BCE7FD; /* like this one */
+	/* Not used atm */
+	--accent-purple: #b298dc;
+	--accent-light-blue-grey: #b8d0eb;
+	--accent-light-blue-grey: #bfd7ea; /* like this one */
+	--accent-blue-grey: #a2bce0; /* doesn't work with #beb8eb */
+	--accent-light-grey: #c1dbe3;
+	--accent-light-blue: #bce7fd; /* like this one */
 }
 /* Colour Palette
 
 */
-

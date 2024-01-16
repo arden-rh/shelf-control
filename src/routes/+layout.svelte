@@ -56,7 +56,6 @@
 		});
 
 		if (!loggedIn) {
-			console.log('Logged in:', user);
 			goto('/login');
 		}
 	});
@@ -77,16 +76,15 @@
 		<nav class="flex flex-row">
 			<div class="nav-container flex flex-row justify-between">
 				<a href="/" class="logotype">shelf-control</a>
-				<div>
+				<div class="nav-menu">
 					{#if loading}
-						<div>Loading...</div>
+						<div class="button button-secondary">Loading...</div>
+					{:else if loggedIn}
+						<a class="button button-secondary" href="/profile">Profile</a>
+						<button class="button button-secondary" on:click={handleLogout}>Logout</button>
 					{:else}
-						<div>
-							Logged in: {loggedIn}
-							<slot name="nav" />
-						</div>
+					<a class="button button-secondary" href="/login">Login</a>
 					{/if}
-					<button on:click={handleLogout}>Logout</button>
 				</div>
 			</div>
 		</nav>
@@ -99,7 +97,8 @@
 <style>
 	@import '../app.pcss';
 	@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap');
-	@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@200..700&display=swap');
+	/* @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300..700&display=swap'); */
+	@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;500;600;700&display=swap');
 
 	:global(body) {
 		font-family: var(--body-font);
@@ -108,6 +107,7 @@
 
 	nav {
 		background-color: var(--primary-color);
+		color: var(--primary-grey);
 		color: var(--primary-white);
 		height: 5rem;
 		width: 100%;
@@ -124,6 +124,14 @@
 		padding: 0 1.5rem;
 		width: 100%;
 		max-width: 1200px;
+	}
+
+	.nav-menu {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: flex-end;
+		gap: 1rem;
 	}
 
 	.logotype {

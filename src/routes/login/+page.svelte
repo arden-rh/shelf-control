@@ -26,7 +26,7 @@
 						uid: user?.uid
 					}
 				});
-				goto('/');
+				goto('/profile');
 			})
 			.catch((error) => {
 				return error;
