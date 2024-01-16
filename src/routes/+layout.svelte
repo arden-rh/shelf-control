@@ -76,7 +76,7 @@
 	<div class="layout-container">
 		<nav class="flex flex-row">
 			<div class="nav-container flex flex-row justify-between">
-				<a href="/" class="logotype">bookshelf</a>
+				<a href="/" class="logotype">shelf-control</a>
 				<div>
 					{#if loading}
 						<div>Loading...</div>
@@ -103,14 +103,17 @@
 
 	:global(body) {
 		font-family: var(--body-font);
-		background-color: var(--primary-white);
+		background-color: var(--primary-grey);
 	}
 
 	nav {
 		background-color: var(--primary-color);
 		color: var(--primary-white);
-		padding: 1rem;
+		height: 5rem;
 		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 
 	.nav-container {
@@ -118,7 +121,7 @@
 		flex-direction: row;
 		align-items: center;
 		justify-content: space-between;
-		margin: 0 1rem;
+		padding: 0 1.5rem;
 		width: 100%;
 		max-width: 1200px;
 	}
@@ -136,13 +139,20 @@
 		align-items: center;
 		margin: 0 auto;
 		width: 100%;
+		background-color: var(--primary-color);
 	}
 
 	.main-container {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		margin: 0 2rem;
-		max-width: 1200px;
+		width: 100%;
+		background-color: var(--primary-grey);
+	}
+
+	@media (min-width: 768px) {
+		.nav-container {
+			padding: 0 2rem;
+		}
 	}
 </style>

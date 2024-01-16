@@ -4,41 +4,87 @@
 @tailwind utilities;
 
 /* Global Styles */
+
+button {
+    cursor: pointer;
+}
+
 h1 {
     color: var(--primary-color);
     font-size: 2rem;
     font-family: var(--header-font);
+    font-weight: 600;
+
+}
+
+section {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 0 1rem;
+    max-width: 1200px;
+}
+
+.button-primary {
+    display: flex;
+    background-color: var(--primary-color);
+    border: 2px solid var(--primary-color);
+    color: var(--primary-white);
+    border-radius: 5px;
+    height: 2.75rem;
+    align-items: center;
+    padding: 0 1rem;
+    letter-spacing: 0.075rem;
+    font-family: var(--header-font);
+    font-weight: 400;
+    text-transform: uppercase;
+}
+
+.button-primary:hover {
+    background-color: var(--secondary-color);
+    border: 2px solid var(--secondary-color);
+    color: var(--primary-color);
 }
 
 .page-header {
-    background-color: var(--primary-white);
     color: var(--primary-color);
     margin: 1rem 0;
 }
 
+@media (min-width: 768px) {
+    section {
+        padding: 0 2rem;
+    }
+}
+
 /* Colour Variables */
 :root {
+    /* Colours */
     --primary-black: #0D0D0D;
+    --primary-grey: #D2D7DF;
+    /* --primary-grey: #E8E9EB; */ /* lighter */
+    --secondary-grey: #9FA0C3;
     --primary-white: #F2F2F2;
+    /* --primary-white: #F9F8F8; */
+    /* --primary-white: #E6E6E9; */
+    /* --primary-white: #E9FFF9; */
+    /* --primary-white: #EAEAEA; */
     --primary-color: #34228A;
     --secondary-color: #BEB8EB;
+
+    /* Fonts */
     --header-font: 'Oswald', sans-serif;
     --body-font: 'Merriweather', serif;
+
+    /* Not used atm */
+    --accent-purple: #B298DC;
+    --accent-light-blue-grey: #B8D0EB;
+    --accent-light-blue-grey: #BFD7EA; /* like this one */
+    --accent-blue-grey: #A2BCE0; /* doesn't work with #beb8eb */
+    --accent-light-grey: #C1DBE3;
+    --accent-light-blue: #BCE7FD; /* like this one */
 }
 /* Colour Palette
-#D2D7DF
-#BEB8EB
-#A2BCE0
-#BCE7FD
-#BFD7EA
-#F9F8F8
-#C1DBE3
-#EAEAEA
-#9FA0C3
-#E8E9EB
-#E9FFF9
-#E6E6E9
-#B8D0EB
-#B298DC
+
 */
 

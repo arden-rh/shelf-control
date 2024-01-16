@@ -2,8 +2,10 @@
 	import { createBook } from '$lib/hooks/createUserBook.client';
 	import { createDialog, melt } from '@melt-ui/svelte';
 	import { doc, setDoc } from 'firebase/firestore';
+	import { faRectangleXmark } from '@fortawesome/free-solid-svg-icons';
 	import { fetchGoogleBooks } from '$lib/queries/books';
 	import { FirebaseError } from '@firebase/util';
+	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
 	import { get, writable } from 'svelte/store';
 	import { goto } from '$app/navigation';
 	import { toLibraryBook } from '$lib/utility/toLibraryBook';
@@ -60,32 +62,15 @@
 
 <section>
 	<h1 class="page-header">Add a book to your library</h1>
-	<!-- {#if $queryResult.status === 'loading'}
-		<div>Loading...</div>
-	{:else if $queryResult.error instanceof Error}
-		<div>Error: {$queryResult.error.message}</div>
-	{:else if $queryResult.status === 'success'}
-		<div>Success!</div>
-	{/if} -->
 	<div class="add-book-form">
 		<h2>Search for a book</h2>
 		<form data-sveltekit-keepfocus action="/profile/add-book" method="get">
 			<label>
 				<input type="text" name="q" bind:value={$q} aria-label="Search for a book" />
-				<button type="submit">Search</button>
+				<button type="submit" class="button-primary">Search</button>
 			</label>
 		</form>
 	</div>
-
-	<!-- {#if $queryResult.status === 'success' && $queryResult.data}
-		<ul>
-			{#each $queryResult.data.items as book}
-				<li>
-					{book.volumeInfo.title}
-				</li>
-			{/each}
-		</ul>
-	{/if} -->
 	{#if data}
 		{#if data.status === 200}
 			{#if data.props.data.items}
@@ -97,20 +82,33 @@
 								use:melt={$trigger}
 								class="book-list-item-button flex flex-row items-center gap-5 px-3"
 							>
-								<!-- {book.volumeInfo.title} <button class="border" use:melt={$trigger}>Read more</button> -->
-								{#if book.volumeInfo.imageLinks?.thumbnail}
-									<img
-										src={book.volumeInfo.imageLinks.thumbnail}
-										alt={book.volumeInfo.title}
-										class="max-h-36 object-cover object-center"
-									/>
-								{:else}
-									<div class="placeholder-thumbnail max-h-36">Cover Missing</div>
-								{/if}
-								<h3>{book.volumeInfo.title}</h3>
-								<!-- <button class="" on:click={() => openDialog(book.volumeInfo)} use:melt={$trigger}
-									>Read more</button
-								> -->
+								<div class="thumbnail-container">
+									{#if book.volumeInfo.imageLinks?.thumbnail}
+										<img
+											src={book.volumeInfo.imageLinks.thumbnail}
+											alt={book.volumeInfo.title}
+											class="max-h-36 max-w-24 object-cover object-center"
+										/>
+									{:else}
+										<div class="placeholder-thumbnail max-h-36">Cover Missing</div>
+									{/if}
+								</div>
+								<div class="book-info">
+									<h3><span>Title:</span> {book.volumeInfo.title}</h3>
+									<h4>
+										<span
+											>{book.volumeInfo.authors && book.volumeInfo.authors.length > 1
+												? 'Authors:'
+												: 'Author:'}</span
+										>
+										{book.volumeInfo.authors ? book.volumeInfo.authors.join(', ') : 'N/A'}
+									</h4>
+									<h4>
+										<span>Published:</span>{book.volumeInfo.publishedDate
+											? book.volumeInfo.publishedDate
+											: 'Unknown'}
+									</h4>
+								</div>
 							</button>
 						</li>
 					{/each}
@@ -129,26 +127,101 @@
 		{#if $open && $selectedBook}
 			<div class="fixed inset-0 z-50 bg-black/50" use:melt={$overlay} />
 			<div
-				class="fixed left-[50%] top-[50%] z-50 max-h-[85vh] w-[90vw]
-            max-w-[450px] translate-x-[-50%] translate-y-[-50%] rounded-md bg-white
-            p-6 shadow-lg"
+				class="dialog fixed left-[50%] top-[50%] z-50 max-h-[85vh]
+            w-[90vw] max-w-[550px] translate-x-[-50%] translate-y-[-50%]
+            rounded-md p-6 shadow-lg"
 				use:melt={$content}
 			>
-				<div class="flex flex-row justify-between">
-					<h2 use:melt={$title}>{$selectedBook.title}</h2>
-					<button use:melt={$close}>Close Dialog</button>
+				<h3 use:melt={$title}>{$selectedBook.title}</h3>
+				<div class="dialog-cover-info">
+					{#if $selectedBook.imageLinks?.thumbnail}
+						<img src={$selectedBook.imageLinks.thumbnail} alt={$selectedBook.title} />
+					{:else}
+						<div class="placeholder-thumbnail">Cover Missing</div>
+					{/if}
+					<ul>
+						<li>
+							<span
+								>{$selectedBook.authors && $selectedBook.authors.length > 1
+									? 'Authors: '
+									: 'Author: '}</span
+							>
+							{$selectedBook.authors ? $selectedBook.authors.join(', ') : 'N/A'}
+						</li>
+						<li>
+							<span>Publisher:</span>
+							{$selectedBook.publisher ? $selectedBook.publisher : 'Unknown'}
+						</li>
+						<li>
+							<span>Published:</span>
+							{$selectedBook.publishedDate ? $selectedBook.publishedDate : 'Unknown'}
+						</li>
+						<li>
+							<span>Print Type:</span>
+							{$selectedBook.printType ? $selectedBook.printType : 'Unknown'}
+						</li>
+						<li>
+							<span>Page count:</span>
+							{$selectedBook.pageCount ? $selectedBook.pageCount : 'Unknown'}
+						</li>
+						<li>
+							<span>Language:</span>
+							{$selectedBook.language ? $selectedBook.language.toUpperCase() : 'Unknown'}
+						</li>
+						<li>
+							<span>ISBN:</span>
+							{$selectedBook.industryIdentifiers
+								? $selectedBook.industryIdentifiers[0].identifier
+								: 'Unknown'}
+						</li>
+						<li>
+							<span>Categories:</span>
+							{$selectedBook.categories ? $selectedBook.categories.join(', ') : 'Unknown'}
+						</li>
+					</ul>
 				</div>
 				{#if $selectedBook.description}
-					<p use:melt={$description}>{$selectedBook.description}</p>
+					<p class="dialog-description" use:melt={$description}>{$selectedBook.description}</p>
 				{/if}
-				<button class="hover:bg-black" on:click={() => addBook()}>Add book</button>
+				<div class="dialog-buttons">
+					<button class="button-primary" on:click={() => addBook()}>Add book</button>
+					<button use:melt={$close} class="close-button">
+						<FontAwesomeIcon icon={faRectangleXmark} class="close-icon" />
+					</button>
+				</div>
 			</div>
 		{/if}
 	</div>
 </section>
 
 <style>
-	/* @import '/src/app.pcss'; */
+	:global(.close-icon) {
+		height: 50px;
+	}
+
+	h3 {
+		font-size: 1rem;
+		line-height: 1.25rem;
+		margin-bottom: 0.25rem;
+	}
+
+	h3 span {
+		font-weight: 700;
+		display: block;
+		letter-spacing: 0.05rem;
+	}
+
+	h4 {
+		font-size: 0.75rem;
+		line-height: 1rem;
+		margin-bottom: 0.25rem;
+	}
+
+	h4 span {
+		font-weight: 700;
+		display: block;
+		letter-spacing: 0.03rem;
+	}
 
 	.add-book-form {
 		display: flex;
@@ -161,24 +234,18 @@
 		gap: 0.75rem;
 	}
 
-	.add-book-form label button {
-		background-color: var(--primary-color);
-		border: 2px solid var(--primary-color);
-		color: var(--primary-white);
-		border-radius: 5px;
-		padding: 0.5rem 1rem;
-	}
-
-	.add-book-form label button:hover {
-		background-color: var(--secondary-color);
-		color: var(--primary-color);
-	}
-
 	.add-book-form label input {
 		border: 2px solid var(--primary-color);
 		border-radius: 5px;
 		padding: 0.5rem;
 		width: 100%;
+	}
+
+	.book-info {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		text-align: start;
 	}
 
 	.book-list {
@@ -194,11 +261,7 @@
 
 	.book-list-item:nth-child(even) {
 		background-color: var(--primary-white);
-	}
-
-	.book-list-item-button {
-		width: 100%;
-		padding: 1rem;
+		background-color: var(--primary-grey);
 	}
 
 	.book-list-item:hover {
@@ -206,21 +269,112 @@
 		color: var(--primary-white);
 	}
 
+	.book-list-item-button {
+		width: 100%;
+		padding: 1rem;
+	}
+
+	.close-button {
+		background-color: transparent;
+		color: var(--primary-color);
+		border: none;
+		display: flex;
+		align-items: center;
+		height: fit-content;
+	}
+
+	.close-button:hover {
+		color: var(--secondary-color);
+	}
+
+	.dialog {
+		background-color: var(--primary-white);
+	}
+
+	.dialog h3 {
+		font-size: 1.5rem;
+		line-height: 1.75rem;
+		font-family: var(--header-font);
+		font-weight: 600;
+		letter-spacing: 0.05rem;
+		margin-bottom: 0.75rem;
+	}
+
+	.dialog-buttons {
+		display: flex;
+		flex-direction: row;
+		justify-content: flex-end;
+		gap: 1rem;
+		align-items: center;
+	}
+
+	.dialog-cover-info {
+		display: flex;
+		flex-direction: row;
+		gap: 1rem;
+		margin-bottom: 1rem;
+	}
+
+	.dialog-cover-info img {
+		max-width: 120px;
+		max-height: 180px;
+	}
+
+	.dialog-cover-info ul {
+		padding: 0.25rem 0;
+	}
+
+	.dialog-cover-info ul li {
+		font-size: 0.85rem;
+		line-height: 1rem;
+		margin-bottom: 0.25rem;
+	}
+
+	.dialog-cover-info ul li span {
+		font-weight: 700;
+		letter-spacing: 0.03rem;
+	}
+
+	.dialog-cover-info .placeholder-thumbnail {
+		width: 120px;
+		height: 180px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background-color: var(--secondary-color);
+		color: var(--primary-color);
+		font-size: 1rem;
+	}
+
+	.dialog-description {
+		max-height: 230px;
+		overflow-y: auto;
+		scrollbar-width: thin;
+		margin-bottom: 1rem;
+	}
+
 	.placeholder-thumbnail {
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		width: 100px;
-		/* height: [Your Thumbnail Height] */
-		height: 308px;
-		background-color: var(--secondary-color); 
+		height: 9rem;
+		background-color: var(--secondary-color);
 		color: var(--primary-color);
 		font-size: 1rem;
 	}
 
+	.thumbnail-container {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 120px;
+		height: 9rem;
+	}
+
 	@media (min-width: 768px) {
 		.add-book-form label input {
-			max-width: 50%;
+			max-width: 400px;
 		}
 	}
 </style>
