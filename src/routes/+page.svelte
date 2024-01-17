@@ -33,10 +33,10 @@
 
 <style>
 	section {
-		align-items: end;
-		justify-content: end;
+		align-items: flex-end;
+		justify-content: flex-end;
 		height: calc(100vh - 5rem);
-		background-color: var(--primary-color);
+		background-color: var(--primary-colour-purple);
 		max-width: none;
 	}
 
@@ -79,6 +79,10 @@
 	@media (min-width: 590px) {
 		.hero-container {
 			margin: 0 8rem 12rem;
+		}
+
+		.page-header {
+			margin-bottom: 1rem;
 		}
 	}
 

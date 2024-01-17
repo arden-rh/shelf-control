@@ -2,8 +2,8 @@
 	import {
 		addUniqueBookshelvesAndUpdateUser,
 		getUserLibraryBook
-	} from '$lib/firebase/firebase.client';
-	import { getUserLibraryBooks } from '$lib/firebase/firebase.client';
+	} from '$lib/firebase/bookFirestore';
+	import { getUserLibraryBooks } from '$lib/firebase/libraryFirestore';
 	import { page } from '$app/stores';
 	import { session } from '$lib/stores/session';
 	import { writable } from 'svelte/store';
@@ -14,16 +14,16 @@
 	import { load } from '../../+layout';
 
 	const selectedBook = writable({} as LibraryBookWithId);
-	// const bookId = writable('');
 	let loading: boolean = true;
 	let loggedIn: boolean = false;
 	let user: LoggedInUser | null = null;
 	let books: LibraryBookWithId[] = [];
 	let book: LibraryBookWithId | undefined;
-	let newBookShelves = ['fantasy', 'read-in-2021'];
+	let newBookshelves = ['fantasy', 'read-in-2021'];
+	let staticSite = false;
 
 	$: bookId = $page.url.searchParams.get('bookId');
-	$: bookshelf = $page.url.searchParams.get('booshelf');
+	$: bookshelf = $page.url.searchParams.get('bookshelf');
 	$: noQuery = !$page.url.searchParams.has('bookId') && !$page.url.searchParams.has('bookshelf');
 
 	session.subscribe((current: SessionState) => {
@@ -40,6 +40,14 @@
 		fetchBook();
 	}
 
+	$: if (books.length === 0) {
+		staticSite = true;
+	}
+
+	$: if (books.length > 0) {
+		staticSite = false;
+	}
+
 	function editBookShelves(book: LibraryBookWithId) {
 		selectedBook.set(book);
 		updateBookShelves();
@@ -51,7 +59,7 @@
 		}
 
 		try {
-			await addUniqueBookshelvesAndUpdateUser(user.uid, $selectedBook._id, newBookShelves);
+			await addUniqueBookshelvesAndUpdateUser(user.uid, $selectedBook._id, newBookshelves);
 			console.log('Bookshelves updated successfully');
 			// Handle successful update
 		} catch (error) {
@@ -121,7 +129,7 @@
 	// }
 </script>
 
-<section>
+<section class={staticSite ? 'staticSite' : ''}>
 	<div class="page-header">
 		<h1>Library</h1>
 	</div>
@@ -130,23 +138,106 @@
 	{:else if bookshelf && !loading}
 		<p>hej</p>
 	{:else if noQuery && !loading}
-		<div>
-			<ul>
+		<div class="library-container">
+			{#if books.length === 0}
+				<p>This was a very empty library! Maybe you want to add your first book or a bookshelf?</p>
+				<div class="link-container">
+					<a href="/profile/add-book" class="button button-primary">Add Book</a>
+					<a href="/profile/add-bookshelf" class="button button-secondary">Add Bookshelf</a>
+				</div>
+			{/if}
+			<div class="grid-container">
 				{#each books as book}
-					<li>
-						<a href={`/profile/library/${book._id}`}>
+					<div class="grid-item">
+						<a href={`/profile/library?bookId=${book._id}`}>
 							<img src={book.imageLinks?.thumbnail} alt={book.title} />
 							<h2>{book.title}</h2>
-							<p>{book.authors}</p>
+							<!-- <p>{book.authors}</p> -->
 						</a>
 						<button on:click={() => editBookShelves(book)} class="button">
 							Edit bookshelves
 						</button>
-					</li>
+					</div>
 				{/each}
-			</ul>
+			</div>
 		</div>
 	{:else if loading}
 		<p>Loading...</p>
 	{/if}
 </section>
+
+<style>
+	section {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		max-width: 1000px;
+	}
+	.staticSite {
+		flex-direction: column;
+		align-items: flex-start;
+		justify-content: flex-start;
+		height: calc(100vh - 5rem);
+		max-width: none;
+	}
+	.link-container {
+		margin-top: 2rem;
+		display: flex;
+		flex-direction: row;
+		gap: 1rem;
+	}
+
+	.library-container {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		/* height: calc(100vh - 5rem); */
+		width: 100%;
+		margin-bottom: 5rem;
+	}
+
+	.grid-container {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+		gap: 20px;
+		justify-content: center;
+		width: 100%;
+	}
+
+	.grid-item {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: flex-start;
+		text-align: center;
+		width: 180px;
+		min-height: 300px;
+		overflow: hidden;
+		justify-self: center;
+	}
+
+	.grid-item a {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: flex-start;
+		text-align: center;
+		width: 100%;
+		height: 100%;
+	}
+
+	.grid-item img {
+		width: auto;
+		height: 200px;
+		object-fit: contain;
+		object-position: center;
+	}
+
+	.grid-item h2 {
+		margin-top: 10px;
+		font-size: 1em;
+		word-wrap: break-word;
+	}
+</style>

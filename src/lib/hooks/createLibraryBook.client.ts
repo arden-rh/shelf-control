@@ -1,6 +1,6 @@
 import { doc, setDoc } from 'firebase/firestore';
 import { FirebaseError } from '@firebase/util';
-import { getUserLibraryCollection } from '$lib/firebase/firebase.client';
+import { getUserLibraryCollection } from '$lib/firebase/libraryFirestore';
 import { writable } from 'svelte/store';
 import type { LibraryBook } from '$lib/types/books.types';
 

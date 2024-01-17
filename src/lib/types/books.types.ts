@@ -1,11 +1,10 @@
 export interface LibraryBook {
-    title: string;
     authors?: string[];
-    publisher?: string;
-    publishedDate?: string;
-    description?: string;
-    pageCount?: number;
+    bookshelves?: string[];
+    canonicalVolumeLink?: string;
     categories?: string[];
+    description?: string;
+    language?: string;
     imageLinks?: {
         smallThumbnail?: string;
         thumbnail?: string;
@@ -14,9 +13,11 @@ export interface LibraryBook {
         type: string;
         identifier: string;
     }[];
-    language?: string;
-    canonicalVolumeLink?: string;
-    bookshelves?: string[];
+    pageCount?: number;
+    printType: string;
+    publishedDate?: string;
+    publisher?: string;
+    title: string;    
     userId: string;
 }
 

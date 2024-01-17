@@ -7,16 +7,22 @@
 	import { QueryClient, QueryClientProvider } from '@sveltestack/svelte-query';
 	import { session } from '$lib/stores/session';
 	import { signOut } from 'firebase/auth';
-	import type { AppUser } from '$lib/types/user.types';
-	import type { SessionState } from '$lib/types/session.types';
-	import type { LayoutData } from './$types';
 	import { userStore } from '$lib/stores/user';
+	import Toaster from '$lib/components/Toaster.svelte';
+	import type { AppUser } from '$lib/types/user.types';
+	import type { LayoutData } from './$types';
+	import type { SessionState } from '$lib/types/session.types';
 
 	export let data: LayoutData;
 
 	let loading: boolean = true;
 	let loggedIn: boolean = false;
 	let appUser: AppUser | null = null;
+	const privateInfoDefault: AppUser['privateInfo'] = {
+		bookshelves: 'users',
+		favourites: 'users',
+		profilePicture: 'users'
+	};
 
 	const {
 		elements: { trigger, menu, item, separator, arrow },
@@ -40,7 +46,7 @@
 
 	onMount(async () => {
 		const user: any = await data.getAuthUser();
-
+		const storedAppUser = localStorage.getItem('appUser');
 		const loggedIn = !!user;
 
 		try {
@@ -53,18 +59,20 @@
 				};
 			});
 
-			userStore.update((current) => {
-				return {
-					...current,
-					...user
-				};
-			});
+			if (storedAppUser) {
+				userStore.set(JSON.parse(storedAppUser));
+			} else {
+				console.log('No stored user found');
+			}
+
 			loading = false;
 		} catch (error) {
 			console.error('Error fetching user:', error);
 		}
 
-		if (!loggedIn) {
+		if (!loggedIn && !storedAppUser) {
+			goto('/register');
+		} else if (!loggedIn && storedAppUser) {
 			goto('/login');
 		}
 	});
@@ -73,12 +81,16 @@
 		try {
 			await signOut(auth);
 			session.update(() => ({ user: null, loading: false, loggedIn: false }));
+			userStore.set({ privateInfo: privateInfoDefault });
+			localStorage.removeItem('loggedIn');
 			goto('/login');
 		} catch (error) {
 			console.error('Logout failed:', error);
 		}
 	}
 </script>
+
+<Toaster />
 
 <div class="layout-container">
 	<nav class="flex flex-row">
@@ -113,7 +125,7 @@
 	}
 
 	nav {
-		background-color: var(--primary-color);
+		background-color: var(--primary-colour-purple);
 		color: var(--primary-grey);
 		color: var(--primary-white);
 		height: 5rem;
@@ -154,7 +166,7 @@
 		align-items: center;
 		margin: 0 auto;
 		width: 100%;
-		background-color: var(--primary-color);
+		background-color: var(--primary-colour-purple);
 	}
 
 	.main-container {

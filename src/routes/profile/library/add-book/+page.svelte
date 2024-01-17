@@ -3,12 +3,12 @@
 	import { createDialog, melt } from '@melt-ui/svelte';
 	import { faRectangleXmark } from '@fortawesome/free-solid-svg-icons';
 	import { fetchGoogleBooks } from '$lib/queries/books';
-	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
 	import { get, writable } from 'svelte/store';
 	import { goto } from '$app/navigation';
+	import { session } from '$lib/stores/session';
 	import { toLibraryBook } from '$lib/utility/toLibraryBook';
 	import { useQuery } from '@sveltestack/svelte-query';
-	import { session } from '$lib/stores/session';
+	import Fa from 'svelte-fa'
 	import type { LibraryBook, VolumeInfo } from '$lib/types/books.types';
 	import type { PageData } from './$types';
 	import type { SessionState } from '$lib/types/session.types';
@@ -16,7 +16,6 @@
 
 	const q = writable('');
 	const selectedBook = writable({} as VolumeInfo);
-	let loggedIn: boolean = false;
 	let user: LoggedInUser | null = null;
 
 	export let data: PageData;
@@ -27,7 +26,6 @@
 	} = createDialog();
 
 	session.subscribe((current: SessionState) => {
-		loggedIn = current?.loggedIn;
 		user = current?.user;
 	});
 
@@ -69,7 +67,7 @@
 	</div>
 	<div class="add-book-form">
 		<h2>Search for a book</h2>
-		<form data-sveltekit-keepfocus action="/profile/add-book" method="get">
+		<form data-sveltekit-keepfocus action="/profile/library/add-book" method="get">
 			<label>
 				<input type="text" name="q" bind:value={$q} aria-label="Search for a book" />
 				<button type="submit" class="button button-primary">Search</button>
@@ -191,7 +189,7 @@
 				<div class="dialog-buttons">
 					<button class="button button-primary" on:click={() => addBook()}>Add book</button>
 					<button use:melt={$close} class="close-button">
-						<FontAwesomeIcon icon={faRectangleXmark} class="close-icon" />
+						<Fa icon={faRectangleXmark} class="close-icon" />
 					</button>
 				</div>
 			</div>
@@ -248,7 +246,7 @@
 	}
 
 	.add-book-form label input {
-		border: 2px solid var(--primary-color);
+		border: 2px solid var(--primary-colour-purple);
 		border-radius: 5px;
 		padding: 0.5rem;
 		width: 100%;
@@ -268,7 +266,7 @@
 	}
 
 	.book-list-item {
-		background-color: var(--secondary-color);
+		background-color: var(--secondary-colour-purple);
 		border-radius: 5px;
 	}
 
@@ -278,7 +276,7 @@
 	}
 
 	.book-list-item:hover {
-		background-color: var(--primary-color);
+		background-color: var(--primary-colour-purple);
 		color: var(--primary-white);
 	}
 
@@ -289,104 +287,6 @@
 
 	.button {
 		height: 2.75rem;
-	}
-
-	.close-button {
-		background-color: transparent;
-		color: var(--primary-color);
-		border: none;
-		display: flex;
-		align-items: center;
-		height: fit-content;
-	}
-
-	.close-button:hover {
-		color: var(--secondary-color);
-	}
-
-	.dialog {
-		background-color: var(--primary-white);
-	}
-
-	.dialog h3 {
-		font-size: 1.5rem;
-		line-height: 1.75rem;
-		font-family: var(--header-font);
-		font-weight: 600;
-		letter-spacing: 0.05rem;
-		margin-bottom: 0.75rem;
-	}
-
-	.dialog-buttons {
-		display: flex;
-		flex-direction: row;
-		justify-content: flex-end;
-		gap: 1rem;
-		align-items: center;
-	}
-
-	.dialog-cover-info {
-		display: flex;
-		flex-direction: row;
-		gap: 1rem;
-		margin-bottom: 1rem;
-	}
-
-	.dialog-cover-info img {
-		max-width: 120px;
-		max-height: 180px;
-	}
-
-	.dialog-cover-info ul {
-		padding: 0.25rem 0;
-	}
-
-	.dialog-cover-info ul li {
-		font-size: 0.85rem;
-		line-height: 1rem;
-		margin-bottom: 0.25rem;
-	}
-
-	.dialog-cover-info ul li span {
-		font-weight: 700;
-		letter-spacing: 0.03rem;
-	}
-
-	.dialog-cover-info .placeholder-thumbnail {
-		width: 120px;
-		height: 180px;
-	}
-
-	.dialog-description {
-		max-height: 230px;
-		overflow-y: auto;
-		scrollbar-width: thin;
-		margin-bottom: 1rem;
-	}
-
-	.placeholder-thumbnail {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 100px;
-		height: 9rem;
-		background-color: var(--accent-purple);
-		color: var(--primary-color);
-		font-size: 1.25rem;
-		font-family: var(--header-font);
-		text-transform: uppercase;
-		letter-spacing: 0.05rem;
-		line-height: 1.5rem;
-		padding: 0 1rem;
-		text-align: center;
-	}
-
-	.thumbnail-container {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		min-width: 120px;
-		height: 9rem;
 	}
 
 	@media (min-width: 768px) {

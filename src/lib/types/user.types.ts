@@ -9,14 +9,15 @@ export interface LoggedInUser {
 
 export interface AppUser extends LoggedInUser {
 	library?: LibraryBookWithId[];
-	allBookShelves?: string[];
+	allBookshelves?: string[];
+	currentlyReading?: string;
 	favouriteShelf?: string;
 	favouriteBook?: string;
 	favouriteAuthor?: string;
 	favouriteGenre?: string;
-	privateInfo?: {
-		profilePicture?: 'all' | 'users' | 'none';
-		favorites?: 'all' | 'users' | 'none';
-		bookShelves?: 'all' | 'users' | 'none';
+	privateInfo: {
+		profilePicture: 'all' | 'users' | 'none';
+		favourites: 'all' | 'users' | 'none';
+		bookshelves: 'all' | 'users' | 'none';
 	}
 }

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getUserLibraryBook } from '$lib/firebase/firebase.client';
+	import { getUserLibraryBook } from '$lib/firebase/bookFirestore';
 	import { onMount } from 'svelte';
 	import { session } from '$lib/stores/session';
 	import { page } from '$app/stores';
