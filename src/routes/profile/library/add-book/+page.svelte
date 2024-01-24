@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { createBook } from '$lib/hooks/createLibraryBook.client';
+	import { createLibraryBook } from '$lib/hooks/createLibraryBook.client';
 	import { createDialog, melt } from '@melt-ui/svelte';
 	import { faRectangleXmark } from '@fortawesome/free-solid-svg-icons';
 	import { fetchGoogleBooks } from '$lib/queries/books';
@@ -49,7 +49,7 @@
 			userId
 		};
 
-		const response = await createBook(userId, book);
+		const response = await createLibraryBook(userId, book);
 
 		if (response?.success) {
 			console.log('Book added successfully:');
@@ -70,7 +70,7 @@
 		<form data-sveltekit-keepfocus action="/profile/library/add-book" method="get">
 			<label>
 				<input type="text" name="q" bind:value={$q} aria-label="Search for a book" />
-				<button type="submit" class="button button-primary">Search</button>
+				<button type="submit" class="button button-primary submit-button">Search</button>
 			</label>
 		</form>
 	</div>
@@ -188,8 +188,8 @@
 				{/if}
 				<div class="dialog-buttons">
 					<button class="button button-primary" on:click={() => addBook()}>Add book</button>
-					<button use:melt={$close} class="close-button">
-						<Fa icon={faRectangleXmark} class="close-icon" />
+					<button use:melt={$close} class="close-button button">
+						<Fa icon={faRectangleXmark} size="3x" />
 					</button>
 				</div>
 			</div>
@@ -198,9 +198,6 @@
 </section>
 
 <style>
-	:global(.close-icon) {
-		height: 50px;
-	}
 
 	h1 {
 		padding: 0 0.8rem 0 1.25rem;
@@ -217,6 +214,7 @@
 		line-height: 1.25rem;
 		margin-bottom: 0.25rem;
 		color: var(--primary-black);
+		font-weight: 400;
 	}
 
 	h4 {
@@ -271,21 +269,23 @@
 	}
 
 	.book-list-item:nth-child(even) {
-		background-color: var(--primary-white);
-		background-color: var(--primary-grey);
+		background-color: var(--accent-light-blue-grey);
 	}
 
 	.book-list-item:hover {
 		background-color: var(--primary-colour-purple);
 		color: var(--primary-white);
 	}
-
 	.book-list-item-button {
 		width: 100%;
 		padding: 1rem;
 	}
 
-	.button {
+	.book-list-item-button:hover h3 {
+		color: var(--primary-white);
+	}
+
+	.submit-button {
 		height: 2.75rem;
 	}
 

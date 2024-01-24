@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { session } from '$lib/stores/session';
 	import { userStore } from '$lib/stores/user';
-	import { auth, getUser } from '$lib/firebase/firebase.client';
+	import { auth } from '$lib/firebase/firebase.client';
+	import { getUser } from '$lib/firebase/userFirestore';
 	import {
 		GoogleAuthProvider,
 		signInWithPopup,
@@ -52,8 +53,9 @@
 
 	onMount(async () => {
 		const loggedInStatus = localStorage.getItem('loggedIn');
+		const appUser = localStorage.getItem('appUser');
 
-		if (loggedInStatus === 'true') {
+		if (loggedInStatus === 'true' && appUser) {
 			goto('/profile');
 		}
 	});

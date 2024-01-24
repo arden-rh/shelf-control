@@ -3,14 +3,18 @@
  * 
  */
 
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { browser } from "$app/environment";
 import { db, initializeFirebase } from "./firebase.client";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import type { AppUser } from "$lib/types/user.types";
-
-initializeFirebase().catch(console.error);
 
 /** Get User */
 export const getUser = async (userId: string) => {
+
+    if (browser) {
+        await initializeFirebase().catch(console.error);
+    }
+
 	try {
 		if (!db) {
 			console.warn('Firestore is not initialized');
@@ -29,6 +33,11 @@ export const getUser = async (userId: string) => {
 
 /** Update User */
 export const updateUser = async (userId: string, userData: Partial<AppUser>) => {
+
+    if (browser) {
+        await initializeFirebase().catch(console.error);
+    }
+
     try {
 		if (!db) {
 			console.warn('Firestore is not initialized');
@@ -49,6 +58,10 @@ export const updateUser = async (userId: string, userData: Partial<AppUser>) => 
 
 /** Get a User's Bookshelves */
 export const getUserBookshelves = async (userId: string) => {
+
+    if (browser) {
+        await initializeFirebase().catch(console.error);
+    }
 
 	if (!db) {
 		console.warn('Firestore is not initialized');

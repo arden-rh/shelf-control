@@ -17,6 +17,7 @@ export interface LibraryBook {
     printType: string;
     publishedDate?: string;
     publisher?: string;
+    readingStatus?: 'want-to-read' | 'reading' | 'read';
     title: string;    
     userId: string;
 }

@@ -1,4 +1,4 @@
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, updateDoc } from 'firebase/firestore';
 import { FirebaseError } from '@firebase/util';
 import { getUserLibraryCollection } from '$lib/firebase/libraryFirestore';
 import { writable } from 'svelte/store';
@@ -9,7 +9,7 @@ export const error = writable<boolean>(false);
 export const success = writable<boolean>(false);
 export const loading = writable<boolean>(false);
 
-export async function createLibraryBook(userId: string, data: LibraryBook) {
+export async function editLibraryBook(userId: string, data: LibraryBook) {
 	success.set(false);
 	error.set(false);
 	errorMsg.set(null);
@@ -26,7 +26,7 @@ export async function createLibraryBook(userId: string, data: LibraryBook) {
 		const docRef = doc(libraryCollection);
 
 		try {
-			await setDoc(docRef, { ...data, _id: docRef.id });
+			await updateDoc(docRef, { ...data, _id: docRef.id });
 			success.set(true);
 
 			return { success: true, bookId: docRef.id };

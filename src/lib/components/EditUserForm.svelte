@@ -68,6 +68,7 @@
 			{/if}
 		</span>
 
+		<span><h3>Privacy Options</h3></span>
 		<span>
 			<label for="profile-picture">Profile Picture</label>
 			<select id="profile-picture" bind:value={privateInfo.profilePicture}>
@@ -103,6 +104,10 @@
 
 <style>
 
+	h3 {
+		font-size: 1rem;
+	}
+
 	.button-group {
 		display: flex;
 		flex-direction: row;
@@ -136,7 +141,7 @@
 		justify-content: center;
 		border-radius: 5px;
 		font-family: var(--header-font);
-		font-size: 0.9rem;
+		font-size: 0.8rem;
 		display: flex;
 		height: 2.75rem;
 		letter-spacing: 0.075rem;

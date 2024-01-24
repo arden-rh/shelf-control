@@ -12,14 +12,18 @@ import {
 	where,
 	writeBatch
 } from 'firebase/firestore';
+import { browser } from '$app/environment';
 import { db, initializeFirebase } from './firebase.client';
 import { getUserLibraryCollection } from './libraryFirestore';
 import type { LibraryBookWithId } from '$lib/types/books.types';
 
-initializeFirebase().catch(console.error);
-
 /** Get One Library Book */
 export const getUserLibraryBook = async (userId: string, bookId: string) => {
+
+    if (browser) {
+        await initializeFirebase().catch(console.error);
+    }
+
 	try {
 		const libraryCollectionRef = await getUserLibraryCollection(userId);
 		if (!libraryCollectionRef) {
@@ -41,6 +45,11 @@ export const getUserLibraryBook = async (userId: string, bookId: string) => {
 
 /** Get all Books with the same 'bookshelf' tag */
 export const getBooksByBookshelf = async (userId: string, bookshelf: string) => {
+
+    if (browser) {
+        await initializeFirebase().catch(console.error);
+    }
+
 	if (!db) {
 		console.warn('Firestore is not initialized');
 		return undefined;
@@ -71,6 +80,11 @@ export const addUniqueBookshelvesAndUpdateUser = async (
 	bookId: string,
 	newBookshelves: string[]
 ) => {
+
+    if (browser) {
+        await initializeFirebase().catch(console.error);
+    }
+
 	if (!db) {
 		console.warn('Firestore is not initialized');
 		return undefined;

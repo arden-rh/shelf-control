@@ -387,12 +387,13 @@
 		display: flex;
 		flex-direction: row;
 		align-items: flex-end;
-		justify-content: flex-start;
+		justify-content: flex-end;
 		width: 98%;
 		border: 12px solid var(--secondary-colour-purple);
 		box-shadow: inset -8px -8px 0px 0px rgba(178, 152, 220, 1);
 		position: relative;
 		padding: 0.8rem 0 0;
+		padding: 0.8rem 1.25rem 1.25rem;
 		margin-left: 0.5rem;
 	}
 
@@ -551,5 +552,6 @@
 
 	.bookshelves-container.second {
 		margin: 0 0 5rem 0.5rem;
+		justify-content: flex-start;
 	}
 </style>

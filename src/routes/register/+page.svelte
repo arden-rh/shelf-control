@@ -156,10 +156,10 @@
 		height: 2.75rem;
 		letter-spacing: 0.075rem;
 		text-transform: uppercase;
-		border: 2px solid var(--primary-grey);
+		border: 2px solid var(--accent-light-blue-grey);
 		color: var(--primary-black);
 		font-weight: 400;
-		background-color: var(--primary-grey);
+		background-color: var(--accent-light-blue-grey);
 		min-width: 35%;
 		flex: 0 0 auto;
 		margin-bottom: 0.5rem;

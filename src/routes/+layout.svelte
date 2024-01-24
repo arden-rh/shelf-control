@@ -121,7 +121,7 @@
 
 	:global(body) {
 		font-family: var(--body-font);
-		background-color: var(--primary-grey);
+		background-color: var(--accent-light-blue-grey);
 	}
 
 	nav {
@@ -160,6 +160,10 @@
 		letter-spacing: 0.05rem;
 	}
 
+	.logotype:hover {
+		color: var(--primary-grey);
+	}
+
 	.layout-container {
 		display: flex;
 		flex-direction: column;
@@ -174,7 +178,7 @@
 		flex-direction: column;
 		align-items: center;
 		width: 100%;
-		background-color: var(--primary-grey);
+		background-color: var(--accent-light-blue-grey);
 	}
 
 	@media (min-width: 768px) {

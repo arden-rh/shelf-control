@@ -3,14 +3,17 @@
  * 
  */
 
+import { browser } from "$app/environment";
 import { collection, doc, getDocs} from "firebase/firestore";
 import { db, initializeFirebase } from "./firebase.client";
 import type { LibraryBookWithId } from "$lib/types/books.types";
 
-initializeFirebase().catch(console.error);
-
 /** Get User's Library Collection */
 export const getUserLibraryCollection = async (userId: string) => {
+
+    if (browser) {
+        await initializeFirebase().catch(console.error);
+    }
 
 	if (!db) {
 		console.warn('Firestore is not initialized');
@@ -23,6 +26,11 @@ export const getUserLibraryCollection = async (userId: string) => {
 
 /** Get All Library Books */
 export const getUserLibraryBooks = async (userId: string) => {
+
+    if (browser) {
+        await initializeFirebase().catch(console.error);
+    }
+    
 	try {
 		const libraryCollectionRef = await getUserLibraryCollection(userId);
 		if (!libraryCollectionRef) {
