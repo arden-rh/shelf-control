@@ -8,7 +8,7 @@ export function toLibraryBook(source: any): LibraryBookWithoutUserId {
         categories: source.categories,
         description: source.description,
         imageLinks: source.imageLinks,
-        isbn: source.industryIdentifiers[0].identifier,
+        industryIdentifyer: source.industryIdentifiers[0].identifier,
         language: source.language,
         pageCount: source.pageCount,
         printType: source.printType,

@@ -12,7 +12,7 @@
 	export let printType: string = '';
 	export let pageCount: number = 0;
 	export let language: string = '';
-	export let isbn: string = '';
+	export let industryIdentifier: string = '';
 	let categoriesString: string = '';
 	export let categories: string[] = [];
 	export let description: string = '';
@@ -42,7 +42,7 @@
 			printType,
 			pageCount,
 			language,
-			isbn,
+			industryIdentifier,
 			categories,
 			description,
 			bookImage,
@@ -102,8 +102,8 @@
 		</span>
 
 		<span>
-			<label for="book-isbn">ISBN</label>
-			<input id="book-isbn" bind:value={isbn} placeholder="Book ISBN" />
+			<label for="book-industry-identifier">Industry Identifier</label>
+			<input id="book-industry-identifier" bind:value={industryIdentifier} placeholder="Book Industry Identifier" />
 		</span>
 
 		<span>

@@ -5,17 +5,10 @@
 	import { editLibraryBook } from '$lib/hooks/editLibraryBook.client';
 	import { writable } from 'svelte/store';
 	import { goto } from '$app/navigation';
-	import { onMount } from 'svelte';
-	import { page } from '$app/stores';
-	import { session } from '$lib/stores/session';
-	import { toLibraryBook } from '$lib/utility/toLibraryBook';
-	import { useQuery } from '@sveltestack/svelte-query';
 	import {
 		addUniqueBookshelvesAndUpdateUser,
-		getUserLibraryBook,
 		updateLibraryBookReadingStatus
 	} from '$lib/firebase/bookFirestore';
-	import { X } from 'lucide-svelte';
 	import EditBookForm from './EditBookForm.svelte';
 	import EditBookshelvesForm from './EditBookshelvesForm.svelte';
 	import type { LibraryBookWithId } from '$lib/types/books.types';
@@ -321,7 +314,7 @@
 						description={book.description}
 						categories={book.categories}
 						language={book.language}
-						isbn={book.isbn}
+						industryIdentifier={book.industryIdentifyer}
 						pageCount={book.pageCount}
 						bookImage={book.imageLinks?.thumbnail}
 						publishedDate={book.publishedDate}

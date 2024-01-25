@@ -9,7 +9,7 @@ export interface LibraryBook {
         smallThumbnail?: string;
         thumbnail?: string;
     };
-    isbn?: string;
+    industryIdentifyer?: string;
     pageCount?: number;
     printType?: string;
     publishedDate?: string;

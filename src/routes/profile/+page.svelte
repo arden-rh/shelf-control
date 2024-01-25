@@ -1,20 +1,19 @@
 <script lang="ts">
+	import { addToast } from '$lib/components/Toaster.svelte';
 	import { createDialog, melt } from '@melt-ui/svelte';
 	import { faRectangleXmark } from '@fortawesome/free-solid-svg-icons';
 	import { favouriteBooksStore } from '$lib/stores/books';
-	import { goto } from '$app/navigation';
-	import { session } from '$lib/stores/session';
-	import { userStore } from '$lib/stores/user';
-	import { writable } from 'svelte/store';
-	import { onDestroy } from 'svelte';
-	import { addToast } from '$lib/components/Toaster.svelte';
 	import { getBooksByBookshelf, getBooksByReadingStatus } from '$lib/firebase/bookFirestore';
 	import { getUserBookshelves } from '$lib/firebase/userFirestore';
+	import { goto } from '$app/navigation';
+	import { onDestroy } from 'svelte';
+	import { session } from '$lib/stores/session';
 	import { updateUser } from '$lib/firebase/userFirestore';
+	import { userStore } from '$lib/stores/user';
+	import { writable } from 'svelte/store';
 	import EditUserForm from '$lib/components/EditUserForm.svelte';
-	import Fa from 'svelte-fa';
-	import type { LibraryBookWithId } from '$lib/types/books.types';
 	import type { AppUser, LoggedInUser } from '$lib/types/user.types';
+	import type { LibraryBookWithId } from '$lib/types/books.types';
 	import type { SessionState } from '$lib/types/session.types';
 
 	const selectedBook = writable({} as LibraryBookWithId);
@@ -233,7 +232,12 @@
 			</section>
 			{#if appUser?.privateInfo?.bookshelves === 'all' || appUser?.privateInfo?.bookshelves === 'users'}
 				<section class="bookshelves">
-					<h2>Bookshelves</h2>
+					<div class="bookshelves-header-container">
+						<h2>Bookshelves</h2>
+						<div class="library-link-container">
+							<a href="/profile/library" class="button button-primary">Go to Library</a>
+						</div>
+					</div>
 					{#if appUser?.favouriteShelf}
 						<h3>Favourite shelf: {appUser?.favouriteShelf}</h3>
 						<div class="bookshelves-container">
@@ -263,14 +267,11 @@
 						<p>No bookshelves added yet.</p>
 					{/if}
 				</section>
-				<div class="library-link-container">
-					<a href="/profile/library" class="button button-primary">Go to Library</a>
-				</div>
 			{/if}
 		</div>
 	</div>
 </section>
-
+<!-- Dialog -->
 <div id="dialog" use:melt={$portalled}>
 	{#if $open}
 		<div class="fixed inset-0 z-50 bg-black/50" use:melt={$overlay} />
@@ -281,7 +282,7 @@
 			use:melt={$content}
 		>
 			{#if $selectedBook && !editingUserProfile}
-				<h3 use:melt={$title}>{$selectedBook.title}</h3>
+				<h3 class="dialog-book-title" use:melt={$title}>{$selectedBook.title}</h3>
 				<div class="dialog-cover-info">
 					<ul>
 						<li>
@@ -321,8 +322,8 @@
 					<a class="button button-primary" href={`profile/library?bookId=${$selectedBook._id}`}
 						>Go to book page</a
 					>
-					<button use:melt={$close} class="close-button">
-						<Fa icon={faRectangleXmark} class="close-icon" />
+					<button use:melt={$close} class="close-button button">
+						Close
 					</button>
 				</div>
 			{:else if editingUserProfile && appUser}
@@ -398,7 +399,7 @@
 		justify-content: space-between;
 		width: 100%;
 		padding: 0;
-		margin-bottom: 2rem;
+		margin-bottom: 5rem;
 		flex-wrap: wrap;
 	}
 
@@ -508,17 +509,11 @@
 		transform: skewY(42deg);
 	}
 
-	.button-secondary {
-		background-color: var(--secondary-grey);
-		color: var(--primary-black);
-		border: none;
-		border-radius: 0;
-		margin: 0 0.5rem 0 0.5rem;
-	}
-
-	.button-secondary:hover {
-		background-color: var(--primary-colour-purple);
-		color: var(--primary-white);
+	.bookshelves-header-container {
+		display: flex;
+		justify-content: space-between;
+		width: 100%;
+		align-items: flex-start;
 	}
 
 	.currently-reading {
@@ -541,20 +536,22 @@
 		gap: 1rem;
 	}
 
+	.dialog-book-title {
+		text-transform: uppercase;
+	}
+
 	.library-link-container {
 		display: flex;
 		flex-direction: row;
 		align-items: center;
 		justify-content: flex-end;
 		width: 100%;
-		margin-bottom: 5rem;
 	}
 
 	.library-link-container .button {
 		height: fit-content;
 		padding: 0.4rem 0.8rem;
 		margin-right: 0.5rem;
-		box-shadow: none;
 	}
 
 	.profile-container {

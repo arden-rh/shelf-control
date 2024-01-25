@@ -4,7 +4,7 @@
  */
 
 import { browser } from "$app/environment";
-import { collection, doc, getDocs} from "firebase/firestore";
+import { collection, doc, getDocs, updateDoc} from "firebase/firestore";
 import { db, initializeFirebase } from "./firebase.client";
 import type { LibraryBookWithId } from "$lib/types/books.types";
 
@@ -44,3 +44,23 @@ export const getUserLibraryBooks = async (userId: string) => {
 		throw error;
 	}
 };
+
+export const updateUserLibraryBookshelves = async (userId: string, bookshelves: string[]) => {
+	if (browser) {
+		await initializeFirebase().catch(console.error);
+	}
+
+	if (!db) {
+		console.warn('Firestore is not initialized');
+		return undefined;
+	}
+
+	try {
+		const userDocRef = doc(db, 'users', userId);
+		await updateDoc(userDocRef, { allBookshelves: bookshelves });
+		return { status: 'success', message: 'Bookshelves updated successfully' };
+	} catch (error) {
+		console.error('Error updating user bookshelves:', error);
+		throw error;
+	}
+}

@@ -4,50 +4,34 @@
 		addUniqueBookshelvesAndUpdateUser,
 		getUserLibraryBook
 	} from '$lib/firebase/bookFirestore';
-	import { getUserLibraryBooks } from '$lib/firebase/libraryFirestore';
+	import {
+		getUserLibraryBooks,
+		updateUserLibraryBookshelves
+	} from '$lib/firebase/libraryFirestore';
+	import { addToast } from '$lib/components/Toaster.svelte';
+	import { getUserBookshelves } from '$lib/firebase/userFirestore';
+	import { onDestroy } from 'svelte';
 	import { page } from '$app/stores';
 	import { session } from '$lib/stores/session';
+	import { userStore } from '$lib/stores/user';
 	import { writable } from 'svelte/store';
 	import BookPage from '$lib/components/BookPage.svelte';
-	import type { LibraryBookWithId } from '$lib/types/books.types';
+	import EditBookshelvesForm from '$lib/components/EditBookshelvesForm.svelte';
 	import type { AppUser, LoggedInUser } from '$lib/types/user.types';
+	import type { LibraryBookWithId } from '$lib/types/books.types';
 	import type { SessionState } from '$lib/types/session.types';
-	import { userStore } from '$lib/stores/user';
-	import { onDestroy } from 'svelte';
-	import { getUserBookshelves } from '$lib/firebase/userFirestore';
 
-	const selectedBook = writable({} as LibraryBookWithId);
 	let appUser: AppUser | undefined;
 	let book: LibraryBookWithId | undefined;
 	let books: LibraryBookWithId[] = [];
 	let bookshelves: string[] = [];
+	let bookshelvesString: string = '';
 	let loading: boolean = true;
-	let loggedIn: boolean = false;
 	let staticSite = false;
 	let user: LoggedInUser | null = null;
-
-	$: bookId = $page.url.searchParams.get('bookId');
-	$: bookshelf = $page.url.searchParams.get('bookshelf');
-	$: noQuery = !$page.url.searchParams.has('bookId') && !$page.url.searchParams.has('bookshelf');
-
-	const {
-		elements: { trigger, portalled, overlay, content, title, description, close },
-		states: { open }
-	} = createDialog();
-
-	const unsubscribeSession = session.subscribe((current: SessionState) => {
-		user = current?.user;
-		loading = current?.loading;
-	});
-
-	const unsubscribeUserStore = userStore.subscribe((current: AppUser) => {
-		appUser = current;
-	});
-
-	onDestroy(() => {
-		unsubscribeSession();
-		unsubscribeUserStore();
-	});
+	let editingBookshelves = false;
+	let addingBookshelves = false;
+	export const bookshelvesStore = writable([] as string[]);
 
 	$: if (user?.uid) {
 		loadBooks(user.uid);
@@ -70,23 +54,99 @@
 		getAllBookshelves();
 	}
 
-	function editBookShelves(book: LibraryBookWithId) {
-		selectedBook.set(book);
-		updateBookShelves();
+	$: if (!$open) {
+		addingBookshelves = false;
+		editingBookshelves = false;
 	}
 
-	async function updateBookShelves() {
-		if (!user?.uid) {
+	$: bookId = $page.url.searchParams.get('bookId');
+	$: bookshelf = $page.url.searchParams.get('bookshelf');
+	$: noQuery = !$page.url.searchParams.has('bookId') && !$page.url.searchParams.has('bookshelf');
+	$: bookshelves = $bookshelvesStore;
+
+	const {
+		elements: { trigger, portalled, overlay, content, title, description, close },
+		states: { open }
+	} = createDialog();
+
+	const unsubscribeSession = session.subscribe((current: SessionState) => {
+		user = current?.user;
+		loading = current?.loading;
+	});
+
+	const unsubscribeUserStore = userStore.subscribe((current: AppUser) => {
+		appUser = current;
+	});
+
+	onDestroy(() => {
+		unsubscribeSession();
+		unsubscribeUserStore();
+	});
+
+	function addBookShelves() {
+		addingBookshelves = true;
+	}
+
+	function editBookShelves() {
+		editingBookshelves = true;
+	}
+
+	function handleCancel() {
+		$open = false;
+	}
+
+	async function handleAddBookshelves() {
+
+		const newBookshelves = bookshelvesString.split('/');
+
+		if (!user || !user.uid) {
 			return;
 		}
 
+
 		try {
-			// await addUniqueBookshelvesAndUpdateUser(user.uid, $selectedBook._id, newBookshelves);
-			console.log('Bookshelves updated successfully');
-			// Handle successful update
+			await updateUserLibraryBookshelves(user.uid, newBookshelves);
+
+			bookshelvesStore.set([...bookshelves, ...newBookshelves]);
+
+			addingBookshelves = false;
+			$open = false;
+
+			addToast({
+				data: {
+					title: 'Success',
+					description: 'Bookshelves added successfully',
+					color: 'green'
+				}
+			});
+		} catch (error) {
+			console.error('Failed to add bookshelves:', error);
+		}
+	}
+
+	async function handleUpdateBookshelves(event: CustomEvent) {
+		const formData = event.detail;
+
+		if (!user || !user.uid) {
+			return;
+		}
+		try {
+			await updateUserLibraryBookshelves(user.uid, formData.bookshelves);
+
+			bookshelvesStore.set(formData.bookshelves);
+
+			editingBookshelves = false;
+			$open = false;
+
+			addToast({
+				data: {
+					title: 'Success',
+					description: 'Bookshelves updated successfully',
+					color: 'green'
+				}
+			});
 		} catch (error) {
 			console.error('Failed to update bookshelves:', error);
-			// Handle error
 		}
 	}
 
@@ -95,6 +155,18 @@
 			books = await getUserLibraryBooks(userId);
 		} catch (error) {
 			console.error('Error fetching books:', error);
+		}
+	}
+
+	async function getAllBookshelves() {
+		if (appUser?.uid) {
+			const response = await getUserBookshelves(appUser.uid);
+
+			if (response) {
+				bookshelves = response;
+				bookshelvesStore.set(bookshelves);
+				loading = false;
+			}
 		}
 	}
 
@@ -111,39 +183,6 @@
 			}
 		}
 	}
-
-	async function getAllBookshelves() {
-		if (appUser?.uid) {
-			const response = await getUserBookshelves(appUser.uid);
-
-			if (response) {
-				bookshelves = response;
-				loading = false;
-			}
-		}
-	}
-
-	// async function deleteBook() {
-	// 	if (user && user.uid && bookId) {
-	// 		try {
-	// 			const response = await deleteUserLibraryBook(user.uid, bookId);
-	// 			console.log(response);
-	// 		} catch (error) {
-	// 			console.error(error);
-	// 		}
-	// 	}
-	// }
-
-	// async function updateBook() {
-	// 	if (user && user.uid && bookId) {
-	// 		try {
-	// 			const response = await updateUserLibraryBook(user.uid, bookId, book);
-	// 			console.log(response);
-	// 		} catch (error) {
-	// 			console.error(error);
-	// 		}
-	// 	}
-	// }
 
 	// async function addBookShelves() {
 	// 	if (user && user.uid && bookId) {
@@ -176,7 +215,9 @@
 			{/if}
 			<div class="library-actions">
 				<a href="/profile/library/add-book" class="button button-primary">Add book</a>
-				<button class="button button-primary">Add bookshelf</button>
+				<button on:click={addBookShelves} use:melt={$trigger} class="button button-primary"
+					>Add bookshelf</button
+				>
 				<button on:click={editBookShelves} use:melt={$trigger} class="button button-primary"
 					>Edit Bookshelves</button
 				>
@@ -186,7 +227,10 @@
 					<h2>Bookshelves</h2>
 					<div class="all-bookshelves-container">
 						{#each bookshelves.sort() as bookshelf}
-							<a class="bookshelves-container small" href={`/profile/library?bookshelf=${bookshelf}`}>
+							<a
+								class="bookshelves-container small"
+								href={`/profile/library?bookshelf=${bookshelf}`}
+							>
 								<h4>{bookshelf}</h4>
 							</a>
 						{/each}
@@ -213,6 +257,45 @@
 		<p>Loading...</p>
 	{/if}
 </section>
+<!-- Dialog -->
+<div id="dialog" use:melt={$portalled}>
+	{#if $open}
+		<div class="fixed inset-0 z-50 bg-black/50" use:melt={$overlay} />
+		<div
+			class="dialog fixed left-[50%] top-[50%] z-50 max-h-[85vh]
+        w-[90vw] max-w-[550px] translate-x-[-50%] translate-y-[-50%]
+        rounded-md p-6 shadow-lg"
+			use:melt={$content}
+		>
+			{#if editingBookshelves}
+				<EditBookshelvesForm
+					{bookshelves}
+					on:cancel={handleCancel}
+					on:save={handleUpdateBookshelves}
+				/>
+			{:else if addingBookshelves}
+				<form action=""></form>
+				<div class="add-bookshelves-form">
+					<form on:submit|preventDefault={handleAddBookshelves}>
+						<label for="bookshelves">Bookshelves</label>
+						<div class="input-with-help-text">
+							<input id="bookshelves" bind:value={bookshelvesString} placeholder="Bookshelves" />
+							<small
+								>Separate bookshelves with a forward slash (/) and use a dash (-) instead of space</small
+							>
+						</div>
+						<div class="button-group">
+							<button class="button button-primary" type="submit">Save Changes</button>
+							<button class="button button-secondary" type="button" on:click={handleCancel}
+								>Cancel</button
+							>
+						</div>
+					</form>
+				</div>
+			{/if}
+		</div>
+	{/if}
+</div>
 
 <style>
 	h2 {
@@ -448,7 +531,6 @@
 
 		.grid-container {
 			grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-
 		}
 
 		.grid-item {

@@ -7,11 +7,11 @@
 	import { session } from '$lib/stores/session';
 	import { toLibraryBook } from '$lib/utility/toLibraryBook';
 	import { useQuery } from '@sveltestack/svelte-query';
-	import Fa from 'svelte-fa';
 	import type { LibraryBook, VolumeInfo } from '$lib/types/books.types';
 	import type { PageData } from './$types';
 	import type { SessionState } from '$lib/types/session.types';
 	import type { LoggedInUser } from '$lib/types/user.types';
+	import { X } from 'lucide-svelte';
 
 	const q = writable('');
 	const selectedBook = writable({} as VolumeInfo);
@@ -106,7 +106,7 @@
 										{book.volumeInfo.authors ? book.volumeInfo.authors.join(', ') : 'N/A'}
 									</h4>
 									<h4>
-										<span>Published:</span>{book.volumeInfo.publishedDate
+										<span>Published:</span> {book.volumeInfo.publishedDate
 											? book.volumeInfo.publishedDate
 											: 'Unknown'}
 									</h4>
@@ -163,7 +163,7 @@
 							{$selectedBook.printType ? $selectedBook.printType : 'Unknown'}
 						</li>
 						<li>
-							<span>Page count:</span>
+							<span>Page Count:</span>
 							{$selectedBook.pageCount ? $selectedBook.pageCount : 'Unknown'}
 						</li>
 						<li>
@@ -171,7 +171,7 @@
 							{$selectedBook.language ? $selectedBook.language.toUpperCase() : 'Unknown'}
 						</li>
 						<li>
-							<span>ISBN:</span>
+							<span>Industry Identifier:</span>
 							{$selectedBook.industryIdentifiers
 								? $selectedBook.industryIdentifiers[0].identifier
 								: 'Unknown'}
@@ -188,7 +188,7 @@
 				<div class="dialog-buttons">
 					<button class="button button-primary" on:click={() => addBook()}>Add book</button>
 					<button use:melt={$close} class="close-button button">
-						<Fa icon={faRectangleXmark} size="3x" />
+						Close
 					</button>
 				</div>
 			</div>
@@ -263,7 +263,6 @@
 
 	.book-list-item {
 		background-color: var(--secondary-colour-purple);
-		border-radius: 5px;
 	}
 
 	.book-list-item:nth-child(even) {
