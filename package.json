@@ -12,7 +12,9 @@
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
 		"test:integration": "playwright test",
-		"test:unit": "vitest"
+		"test:unit": "vitest",
+		"predeploy": "npm run build",
+		"deploy": "netlify deploy --prod"
 	},
 	"devDependencies": {
 		"@melt-ui/pp": "^0.3.0",
@@ -26,6 +28,7 @@
 		"eslint": "^8.28.0",
 		"eslint-config-prettier": "^9.0.0",
 		"eslint-plugin-svelte": "^2.30.0",
+		"netlify-cli": "^17.15.3",
 		"postcss": "^8.4.33",
 		"postcss-load-config": "^5.0.2",
 		"prettier": "^3.0.0",
