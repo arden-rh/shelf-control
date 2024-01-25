@@ -147,15 +147,6 @@
 		color: var(--primary-colour-purple);
 	}
 
-    .button-group {
-		display: flex;
-		flex-direction: row;
-		justify-content: flex-end;
-		gap: 0.5rem;
-        align-self: flex-end;
-        margin-top: 1rem;
-	}
-
 	.tag-container {
 		width: 100%;
 	}

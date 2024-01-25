@@ -4,7 +4,7 @@
 	import { faRectangleXmark } from '@fortawesome/free-solid-svg-icons';
 	import { get, writable } from 'svelte/store';
 	import { goto } from '$app/navigation';
-	import { session } from '$lib/stores/session';
+	import { session } from '$lib/stores/session.stores';
 	import { toLibraryBook } from '$lib/utility/toLibraryBook';
 	import { useQuery } from '@sveltestack/svelte-query';
 	import type { LibraryBook, VolumeInfo } from '$lib/types/books.types';
@@ -36,6 +36,8 @@
 		const selectedBookValue = get(selectedBook);
 
 		const bookValue = toLibraryBook(selectedBookValue);
+
+		console.log('Book value:', bookValue);
 
 		if (!user || !user.uid) {
 			return;

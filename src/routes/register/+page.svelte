@@ -3,8 +3,8 @@
 	import { createUserWithEmailAndPassword } from 'firebase/auth';
 	import { doc, setDoc } from 'firebase/firestore';
 	import { goto } from '$app/navigation';
-	import { session } from '$lib/stores/session';
-	import { userStore } from '$lib/stores/user';
+	import { session } from '$lib/stores/session.stores';
+	import { userStore } from '$lib/stores/user.stores';
 	import { onMount } from 'svelte';
 
 	let email: string = '';
@@ -104,7 +104,10 @@
 
 				<small id="asteriskExplanation">* Required field</small>
 
-				<button class="button button-primary" type="submit">Register</button>
+				<div class="button-group">
+					<button type="submit" class="button button-primary">Register</button>
+					<button type="button" class="button button-secondary" on:click={() => goto('/login')}>Login</button>
+				</div>
 			</form>
 		</div>
 		<div class="page-header">
@@ -137,32 +140,34 @@
 		display: flex;
 		flex-direction: column;
 		align-items: flex-start;
+		margin-bottom: 1rem;
 		width: 100%;
 	}
 
 	.input-group input {
 		border: 2px solid var(--primary-colour-purple);
-		border-radius: 5px;
 		padding: 0.5rem;
 		margin-bottom: 0.5rem;
 		flex-grow: 1;
+		font-size: 0.9rem;
+		width: calc(100% - 30% - 5rem);
 	}
 	.input-group label {
 		align-items: center;
-		border-radius: 5px;
 		font-family: var(--header-font);
 		font-size: 0.9rem;
 		display: flex;
 		height: 2.75rem;
 		letter-spacing: 0.075rem;
 		text-transform: uppercase;
-		border: 2px solid var(--accent-light-blue-grey);
+		border: 2px solid var(--primary-grey);
 		color: var(--primary-black);
 		font-weight: 400;
-		background-color: var(--accent-light-blue-grey);
-		min-width: 35%;
+		background-color: var(--primary-grey);
+		min-width: 30%;
 		flex: 0 0 auto;
 		margin-bottom: 0.5rem;
+		justify-content: center;
 	}
 
 	.input-group span {

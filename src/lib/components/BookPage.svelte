@@ -13,6 +13,7 @@
 	import EditBookshelvesForm from './EditBookshelvesForm.svelte';
 	import type { LibraryBookWithId } from '$lib/types/books.types';
 	import type { LoggedInUser } from '$lib/types/user.types';
+	import { removeBookFromAllBooks } from '$lib/stores/books.stores';
 
 	export let book: LibraryBookWithId;
 	export let user: LoggedInUser | null = null;
@@ -126,6 +127,8 @@
 					editingLibraryBook = false;
 					$open = false;
 
+					removeBookFromAllBooks(book._id);
+
 					goto('/profile/library');
 
 					addToast({
@@ -228,35 +231,35 @@
 					<ul>
 						<li>
 							<span>{book.authors && book.authors.length > 1 ? 'Authors: ' : 'Author: '}</span>
-							{book.authors ? book.authors.join(', ') : 'N/A'}
+							{book.authors.join(', ')}
 						</li>
 						<li>
 							<span>Published:</span>
-							{book.publishedDate ? book.publishedDate : 'Unknown'}
+							{book.publishedDate}
 						</li>
 						<li>
 							<span>Publisher:</span>
-							{book.publisher ? book.publisher : 'Unknown'}
+							{book.publisher}
 						</li>
 						<li>
 							<span>Print type:</span>
-							{book.printType ? book.printType : 'Unknown'}
+							{book.printType}
 						</li>
 						<li>
 							<span>Page count:</span>
-							{book.pageCount ? book.pageCount : 'Unknown'}
+							{book.pageCount >= 0 ? book.pageCount : 'Unknown'}
 						</li>
 						<li>
-							<span>ISBN:</span>
-							{book.isbn ? book.isbn : 'Unknown'}
+							<span>Industry Identifier:</span>
+							{book.industryIdentifyer}
 						</li>
 						<li>
 							<span>Language:</span>
-							{book.language ? book.language.toUpperCase() : 'Unknown'}
+							{book.language.toUpperCase()}
 						</li>
 						<li>
 							<span>Categories:</span>
-							{book.categories ? book.categories.join(', ') : 'No assigned categories'}
+							{book.categories.join(', ')}
 						</li>
 						<li>
 							<span>Bookshelves:</span>
@@ -327,15 +330,15 @@
 						on:delete={handleDelete}
 					/>
 				{:else if deletingBook}
-					<form on:submit|preventDefault={deleteBook}>
+					<div>
 						<h3>Are you sure you want to delete this book?</h3>
 						<div class="button-group">
-							<button class="button button-primary" type="submit">Yes</button>
+							<button class="button button-primary" type="button" on:click={deleteBook}>Yes</button>
 							<button class="button button-secondary" type="button" on:click={handleCancel}
 								>No</button
 							>
 						</div>
-					</form>
+					</div>
 				{/if}
 			</div>
 		{/if}
@@ -365,13 +368,6 @@
 		text-transform: uppercase;
 	}
 
-	.button-group {
-		display: flex;
-		flex-direction: row;
-		justify-content: flex-end;
-		gap: 0.5rem;
-		margin-top: 1rem;
-	}
 	.book-image {
 		width: fit-content;
 		border: 4px solid var(--primary-colour-purple);
@@ -541,14 +537,12 @@
 		}
 
 		.book-info {
-			/* align-items: flex-end; */
 			flex-direction: column;
 			max-width: fit-content;
 		}
 
 		.book-info-container {
 			flex-direction: row;
-			align-items: flex-start;
 			justify-content: flex-end;
 		}
 	}

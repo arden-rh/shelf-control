@@ -5,9 +5,9 @@
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { QueryClient, QueryClientProvider } from '@sveltestack/svelte-query';
-	import { session } from '$lib/stores/session';
+	import { session } from '$lib/stores/session.stores';
 	import { signOut } from 'firebase/auth';
-	import { userStore } from '$lib/stores/user';
+	import { userStore } from '$lib/stores/user.stores';
 	import Toaster from '$lib/components/Toaster.svelte';
 	import type { AppUser } from '$lib/types/user.types';
 	import type { LayoutData } from './$types';

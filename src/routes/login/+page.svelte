@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { session } from '$lib/stores/session';
-	import { userStore } from '$lib/stores/user';
+	import { session } from '$lib/stores/session.stores';
+	import { userStore } from '$lib/stores/user.stores';
 	import { auth } from '$lib/firebase/firebase.client';
 	import { getUser } from '$lib/firebase/userFirestore';
 	import {
@@ -76,9 +76,14 @@
 						<input id="password" bind:value={password} type="password" placeholder="Password" />
 					</span>
 				</div>
-				<button type="submit" class="button button-primary">Login</button>
+				<div class="button-group">
+					<button type="submit" class="button button-primary">Login</button>
+					<button type="button" class="button button-secondary" on:click={() => goto('/register')}>Register</button>
+				</div>
+				
 			</form>
 		</div>
+
 		<a class="button button-secondary" href="/register">Don't have an account? Register here</a>
 		<div class="page-header">
 			<h1>Login Page</h1>
@@ -91,7 +96,6 @@
 		flex-direction: column;
 		align-items: flex-end;
 		justify-content: flex-end;
-		height: calc(100vh - 5rem);
 		max-width: none;
 	}
 
@@ -103,14 +107,14 @@
 		max-width: 1000px;
 		width: 100%;
 		height: 100%;
-		margin: 0 0 6rem;
+		margin: 6rem 0;
 	}
 
 	.login-form {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		margin-top: 3rem;
+		margin: 3rem 0;
 	}
 
 	.login-form form {
@@ -129,14 +133,14 @@
 
 	.input-group input {
 		border: 2px solid var(--primary-colour-purple);
-		border-radius: 5px;
 		padding: 0.5rem;
 		margin-bottom: 0.5rem;
 		flex-grow: 1;
+		font-size: 0.9rem;
+		width: calc(100% - 30% - 5rem);
 	}
 	.input-group label {
 		align-items: center;
-		border-radius: 5px;
 		font-family: var(--header-font);
 		font-size: 0.9rem;
 		display: flex;
@@ -150,6 +154,7 @@
 		min-width: 30%;
 		flex: 0 0 auto;
 		margin-bottom: 0.5rem;
+		justify-content: center;
 	}
 
 	.input-group span {
@@ -158,11 +163,6 @@
 		gap: 0.5rem;
 		align-items: center;
 		width: 100%;
-	}
-
-	.button-secondary {
-		width: fit-content;
-		margin-top: 2rem;
 	}
 
 	.page-header {

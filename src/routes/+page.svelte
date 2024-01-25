@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { session } from '$lib/stores/session';
+	import { session } from '$lib/stores/session.stores';
 	import type { SessionState } from '$lib/types/session.types';
 
 	let loading: boolean = true;

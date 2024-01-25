@@ -1,10 +1,8 @@
 <script lang="ts">
 	import { createDialog, melt } from '@melt-ui/svelte';
+	import { getUserLibraryBook } from '$lib/firebase/bookFirestore';
 	import {
-		addUniqueBookshelvesAndUpdateUser,
-		getUserLibraryBook
-	} from '$lib/firebase/bookFirestore';
-	import {
+		deleteUserLibrary,
 		getUserLibraryBooks,
 		updateUserLibraryBookshelves
 	} from '$lib/firebase/libraryFirestore';
@@ -12,25 +10,24 @@
 	import { getUserBookshelves } from '$lib/firebase/userFirestore';
 	import { onDestroy } from 'svelte';
 	import { page } from '$app/stores';
-	import { session } from '$lib/stores/session';
-	import { userStore } from '$lib/stores/user';
+	import { session } from '$lib/stores/session.stores';
+	import { userStore } from '$lib/stores/user.stores';
 	import { writable } from 'svelte/store';
 	import BookPage from '$lib/components/BookPage.svelte';
 	import EditBookshelvesForm from '$lib/components/EditBookshelvesForm.svelte';
 	import type { AppUser, LoggedInUser } from '$lib/types/user.types';
 	import type { LibraryBookWithId } from '$lib/types/books.types';
 	import type { SessionState } from '$lib/types/session.types';
+	import { allBookStore } from '$lib/stores/books.stores';
 
 	let appUser: AppUser | undefined;
 	let book: LibraryBookWithId | undefined;
 	let books: LibraryBookWithId[] = [];
 	let bookshelves: string[] = [];
-	let bookshelvesString: string = '';
 	let loading: boolean = true;
-	let staticSite = false;
 	let user: LoggedInUser | null = null;
 	let editingBookshelves = false;
-	let addingBookshelves = false;
+	let deletingLibrary = false;
 	export const bookshelvesStore = writable([] as string[]);
 
 	$: if (user?.uid) {
@@ -41,33 +38,30 @@
 		fetchBook();
 	}
 
-	$: if (books.length === 0) {
-		staticSite = true;
-	}
-
-	$: if (books.length > 0) {
-		staticSite = false;
-	}
-
 	$: if (appUser) {
 		loading = true;
 		getAllBookshelves();
 	}
 
 	$: if (!$open) {
-		addingBookshelves = false;
 		editingBookshelves = false;
+		deletingLibrary = false;
 	}
 
 	$: bookId = $page.url.searchParams.get('bookId');
 	$: bookshelf = $page.url.searchParams.get('bookshelf');
 	$: noQuery = !$page.url.searchParams.has('bookId') && !$page.url.searchParams.has('bookshelf');
 	$: bookshelves = $bookshelvesStore;
+	$: books = $allBookStore;
 
 	const {
 		elements: { trigger, portalled, overlay, content, title, description, close },
 		states: { open }
 	} = createDialog();
+
+	const unsubscribeBookStore = allBookStore.subscribe((current: LibraryBookWithId[]) => {
+		books = current;
+	});
 
 	const unsubscribeSession = session.subscribe((current: SessionState) => {
 		user = current?.user;
@@ -79,48 +73,42 @@
 	});
 
 	onDestroy(() => {
+		unsubscribeBookStore();
 		unsubscribeSession();
 		unsubscribeUserStore();
 	});
 
-	function addBookShelves() {
-		addingBookshelves = true;
-	}
-
 	function editBookShelves() {
 		editingBookshelves = true;
+	}
+
+	function deleteLibrary() {
+		deletingLibrary = true;
 	}
 
 	function handleCancel() {
 		$open = false;
 	}
 
-	async function handleAddBookshelves() {
-
-		const newBookshelves = bookshelvesString.split('/');
-
+	async function handleDeleteLibrary() {
 		if (!user || !user.uid) {
 			return;
 		}
-
-
 		try {
-			await updateUserLibraryBookshelves(user.uid, newBookshelves);
+			await deleteUserLibrary(user.uid);
 
-			bookshelvesStore.set([...bookshelves, ...newBookshelves]);
-
-			addingBookshelves = false;
+			allBookStore.set([]);
 			$open = false;
 
 			addToast({
 				data: {
 					title: 'Success',
-					description: 'Bookshelves added successfully',
+					description: 'Library deleted successfully',
 					color: 'green'
 				}
 			});
 		} catch (error) {
-			console.error('Failed to add bookshelves:', error);
+			console.error('Failed to delete library:', error);
 		}
 	}
 
@@ -153,6 +141,7 @@
 	async function loadBooks(userId: string) {
 		try {
 			books = await getUserLibraryBooks(userId);
+			allBookStore.set(books);
 		} catch (error) {
 			console.error('Error fetching books:', error);
 		}
@@ -170,7 +159,6 @@
 		}
 	}
 
-	/** Book Page functions */
 	async function fetchBook() {
 		loading = true;
 		if (user && user.uid && bookId) {
@@ -183,20 +171,9 @@
 			}
 		}
 	}
-
-	// async function addBookShelves() {
-	// 	if (user && user.uid && bookId) {
-	// 		try {
-	// 			const response = await updateUserLibraryBookShelves(user.uid, bookId, book);
-	// 			console.log(response);
-	// 		} catch (error) {
-	// 			console.error(error);
-	// 		}
-	// 	}
-	// }
 </script>
 
-<section class={staticSite ? 'staticSite' : ''}>
+<section>
 	<div class="page-header">
 		<a href="library"><h1>Library</h1></a>
 	</div>
@@ -207,21 +184,36 @@
 	{:else if noQuery && !loading}
 		<div class="library-container">
 			{#if books.length === 0}
-				<p>This was a very empty library! Maybe you want to add your first book or a bookshelf?</p>
-				<div class="link-container">
-					<a href="/profile/add-book" class="button button-primary">Add Book</a>
-					<a href="/profile/add-bookshelf" class="button button-secondary">Add Bookshelf</a>
+				<div class="library-actions">
+					<a href="/profile/library/add-book" class="button button-primary">Add book</a>
+					<button on:click={editBookShelves} use:melt={$trigger} class="button button-primary"
+						>Edit Bookshelves</button
+					>
+				</div>
+				<section class="no-books">
+					<p>
+						This was a very empty library! Maybe you want to add your first book or a bookshelf?
+					</p>
+					<div class="link-container">
+						<a href="/profile/library/add-book" class="button button-primary">Add Book</a>
+						<button on:click={editBookShelves} use:melt={$trigger} class="button button-primary"
+							>Edit Bookshelves</button
+						>
+					</div>
+				</section>
+			{:else}
+				<div class="library-actions">
+					<a href="/profile/library/add-book" class="button button-primary">Add book</a>
+					<button on:click={editBookShelves} use:melt={$trigger} class="button button-primary"
+						>Edit Bookshelves</button
+					>
+					<button
+						on:click={deleteLibrary}
+						use:melt={$trigger}
+						class="button button-primary delete-button">Delete Library</button
+					>
 				</div>
 			{/if}
-			<div class="library-actions">
-				<a href="/profile/library/add-book" class="button button-primary">Add book</a>
-				<button on:click={addBookShelves} use:melt={$trigger} class="button button-primary"
-					>Add bookshelf</button
-				>
-				<button on:click={editBookShelves} use:melt={$trigger} class="button button-primary"
-					>Edit Bookshelves</button
-				>
-			</div>
 			<section>
 				{#if bookshelves.length > 0}
 					<h2>Bookshelves</h2>
@@ -236,21 +228,31 @@
 						{/each}
 					</div>
 				{:else}
-					<p>No bookshelves added yet.</p>
+					<div class="no-bookshelves">
+						<h2>Bookshelves</h2>
+						<p>No bookshelves added yet.</p>
+					</div>
 				{/if}
 			</section>
 			<section class="all-books">
-				<h2>All books</h2>
-				<div class="grid-container bookshelves-container">
-					{#each books as book}
-						<div class="grid-item">
-							<a href={`/profile/library?bookId=${book._id}`}>
-								<img src={book.imageLinks?.thumbnail} alt={book.title} />
-								<h3>{book.title}</h3>
-							</a>
-						</div>
-					{/each}
-				</div>
+				{#if books.length === 0}
+					<div class="no-books">
+						<h2>All books</h2>
+						<p>No books added yet.</p>
+					</div>
+				{:else}
+					<h2>All books</h2>
+					<div class="grid-container bookshelves-container">
+						{#each books as book}
+							<div class="grid-item">
+								<a href={`/profile/library?bookId=${book._id}`}>
+									<img src={book.imageLinks?.thumbnail} alt={book.title} />
+									<h3>{book.title}</h3>
+								</a>
+							</div>
+						{/each}
+					</div>
+				{/if}
 			</section>
 		</div>
 	{:else if loading}
@@ -273,24 +275,13 @@
 					on:cancel={handleCancel}
 					on:save={handleUpdateBookshelves}
 				/>
-			{:else if addingBookshelves}
-				<form action=""></form>
-				<div class="add-bookshelves-form">
-					<form on:submit|preventDefault={handleAddBookshelves}>
-						<label for="bookshelves">Bookshelves</label>
-						<div class="input-with-help-text">
-							<input id="bookshelves" bind:value={bookshelvesString} placeholder="Bookshelves" />
-							<small
-								>Separate bookshelves with a forward slash (/) and use a dash (-) instead of space</small
-							>
-						</div>
-						<div class="button-group">
-							<button class="button button-primary" type="submit">Save Changes</button>
-							<button class="button button-secondary" type="button" on:click={handleCancel}
-								>Cancel</button
-							>
-						</div>
-					</form>
+			{:else if deletingLibrary}
+				<div class="delete-library-container">
+					<h3>Are you sure you want to delete your library?</h3>
+					<div class="button-group">
+						<button class="button button-primary" on:click={handleDeleteLibrary}>Yes</button>
+						<button class="button button-secondary" on:click={handleCancel}>No</button>
+					</div>
 				</div>
 			{/if}
 		</div>
@@ -313,6 +304,7 @@
 		color: var(--priamry-black);
 		line-height: 1.25rem;
 	}
+
 	section {
 		display: flex;
 		flex-direction: column;
@@ -406,12 +398,9 @@
 		display: block;
 	}
 
-	.staticSite {
-		flex-direction: column;
-		align-items: flex-start;
-		justify-content: flex-start;
-		height: calc(100vh - 5rem);
-		max-width: none;
+	.delete-library-container h3 {
+		font-size: 1rem;
+		text-transform: uppercase;
 	}
 
 	.library-actions {
@@ -419,7 +408,7 @@
 		flex-direction: row;
 		align-items: center;
 		justify-content: center;
-		margin-bottom: 1rem;
+		margin-bottom: 1.5rem;
 		align-self: flex-end;
 	}
 	.library-actions .button {
@@ -440,7 +429,6 @@
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		/* height: calc(100vh - 5rem); */
 		width: 100%;
 		margin-bottom: 5rem;
 	}
@@ -495,6 +483,23 @@
 		margin-top: 10px;
 		font-size: 1em;
 		word-wrap: break-word;
+	}
+
+	.no-books,
+	.no-bookshelves {
+		margin: 1rem 0 3rem;
+		width: 100%;
+	}
+
+	.no-books p,
+	.no-bookshelves p {
+		font-size: 0.9rem;
+		text-align: center;
+	}
+
+	.no-books h2,
+	.no-bookshelves h2 {
+		margin-bottom: 2rem;
 	}
 
 	@media (min-width: 590px) {

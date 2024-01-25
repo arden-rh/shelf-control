@@ -109,13 +109,6 @@
 		text-transform: uppercase;
 	}
 
-	.button-group {
-		display: flex;
-		flex-direction: row;
-		justify-content: flex-end;
-		gap: 0.5rem;
-	}
-
 	.edit-user-form {
 		display: flex;
 		flex-direction: column;

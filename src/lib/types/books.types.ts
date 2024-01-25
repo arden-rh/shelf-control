@@ -1,19 +1,19 @@
 export interface LibraryBook {
-    authors?: string[];
+    authors: string[];
     bookshelves?: string[];
-    canonicalVolumeLink?: string;
-    categories?: string[];
-    description?: string;
-    language?: string;
+    canonicalVolumeLink: string;
+    categories: string[];
+    description: string;
+    language: string;
     imageLinks?: {
         smallThumbnail?: string;
         thumbnail?: string;
     };
-    industryIdentifyer?: string;
-    pageCount?: number;
-    printType?: string;
-    publishedDate?: string;
-    publisher?: string;
+    industryIdentifyer: string;
+    pageCount: number;
+    printType: string;
+    publishedDate: string;
+    publisher: string;
     readingStatus: 'to-read' | 'reading' | 'read';
     title: string;    
     userId: string;

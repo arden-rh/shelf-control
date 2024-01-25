@@ -166,14 +166,6 @@
 		color: var(--primary-white);
 	}
 
-	.button-group {
-		display: flex;
-		flex-direction: row;
-		justify-content: flex-end;
-		gap: 0.5rem;
-		margin-top: 1.5rem;
-	}
-
 	.edit-book-form {
 		display: flex;
 		flex-direction: column;

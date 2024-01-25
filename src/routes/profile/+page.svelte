@@ -2,14 +2,14 @@
 	import { addToast } from '$lib/components/Toaster.svelte';
 	import { createDialog, melt } from '@melt-ui/svelte';
 	import { faRectangleXmark } from '@fortawesome/free-solid-svg-icons';
-	import { favouriteBooksStore } from '$lib/stores/books';
+	import { favouriteBooksStore } from '$lib/stores/books.stores';
 	import { getBooksByBookshelf, getBooksByReadingStatus } from '$lib/firebase/bookFirestore';
 	import { getUserBookshelves } from '$lib/firebase/userFirestore';
 	import { goto } from '$app/navigation';
 	import { onDestroy } from 'svelte';
-	import { session } from '$lib/stores/session';
+	import { session } from '$lib/stores/session.stores';
 	import { updateUser } from '$lib/firebase/userFirestore';
-	import { userStore } from '$lib/stores/user';
+	import { userStore } from '$lib/stores/user.stores';
 	import { writable } from 'svelte/store';
 	import EditUserForm from '$lib/components/EditUserForm.svelte';
 	import type { AppUser, LoggedInUser } from '$lib/types/user.types';
@@ -61,7 +61,6 @@
 		getAllCurrentlyReadingBooks();
 		getFavouriteShelf();
 	}
-
 
 	function openBook(book: LibraryBookWithId) {
 		selectedBook.set(book);
@@ -216,20 +215,29 @@
 					</ul>
 				</div>
 			</section>
-			<section class="currently-reading">
-				<h2>Currently Reading</h2>
-				<div class="currently-reading-container">
-					{#if currentlyReadingBooks.length > 0}
-						{#each currentlyReadingBooks as book}
-							<button class="reading-book" on:click={() => openBook(book)} use:melt={$trigger}>
-								<img src={book.imageLinks?.smallThumbnail} alt={`Book over of ${book.title}`} />
-							</button>
-						{/each}
-					{:else}
-						<p>Not reading anything at the moment.</p>
-					{/if}
-				</div>
-			</section>
+			{#if books.length > 0 && !loading}
+				<section class="currently-reading">
+					<h2>Currently Reading</h2>
+					<div class="currently-reading-container">
+						{#if currentlyReadingBooks.length > 0}
+							{#each currentlyReadingBooks as book}
+								<button class="reading-book" on:click={() => openBook(book)} use:melt={$trigger}>
+									<img src={book.imageLinks?.smallThumbnail} alt={`Book over of ${book.title}`} />
+								</button>
+							{/each}
+						{:else}
+							<p>Not reading anything at the moment.</p>
+						{/if}
+					</div>
+				</section>
+			{:else}
+				<section class="empty-library">
+					<h2>Library</h2>
+					<div class="library-link-container">
+						<a href="/profile/library" class="button button-primary">Go to Library</a>
+					</div>
+				</section>
+			{/if}
 			{#if appUser?.privateInfo?.bookshelves === 'all' || appUser?.privateInfo?.bookshelves === 'users'}
 				<section class="bookshelves">
 					<div class="bookshelves-header-container">
@@ -322,9 +330,7 @@
 					<a class="button button-primary" href={`profile/library?bookId=${$selectedBook._id}`}
 						>Go to book page</a
 					>
-					<button use:melt={$close} class="close-button button">
-						Close
-					</button>
+					<button use:melt={$close} class="close-button button"> Close </button>
 				</div>
 			{:else if editingUserProfile && appUser}
 				<EditUserForm
@@ -481,7 +487,7 @@
 		border: 12px solid var(--secondary-colour-purple);
 		box-shadow: inset -8px -8px 0px 0px var(--accent-pink-purple);
 		position: relative;
- 		padding: 0.8rem 1.25rem 1.25rem;
+		padding: 0.8rem 1.25rem 1.25rem;
 	}
 
 	.bookshelves-container::before,
@@ -538,6 +544,16 @@
 
 	.dialog-book-title {
 		text-transform: uppercase;
+	}
+
+	.empty-library {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		justify-content: center;
+		width: 100%;
+		padding: 0;
+		margin: 0 0 3rem 0.5rem;
 	}
 
 	.library-link-container {
