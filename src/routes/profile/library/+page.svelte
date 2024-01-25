@@ -104,11 +104,17 @@
 				data: {
 					title: 'Success',
 					description: 'Library deleted successfully',
-					color: 'green'
+					status: 'success'
 				}
 			});
 		} catch (error) {
-			console.error('Failed to delete library:', error);
+			addToast({
+				data: {
+					title: 'Error',
+					description: 'Failed to delete library',
+					status: 'error'
+				}
+			});
 		}
 	}
 
@@ -130,11 +136,17 @@
 				data: {
 					title: 'Success',
 					description: 'Bookshelves updated successfully',
-					color: 'green'
+					status: 'success'
 				}
 			});
 		} catch (error) {
-			console.error('Failed to update bookshelves:', error);
+			addToast({
+				data: {
+					title: 'Error',
+					description: 'Failed to update bookshelves',
+					status: 'error'
+				}
+			});
 		}
 	}
 

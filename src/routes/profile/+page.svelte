@@ -1,10 +1,9 @@
 <script lang="ts">
 	import { addToast } from '$lib/components/Toaster.svelte';
 	import { createDialog, melt } from '@melt-ui/svelte';
-	import { faRectangleXmark } from '@fortawesome/free-solid-svg-icons';
+	import { deleteUserAccount, getUserBookshelves } from '$lib/firebase/userFirestore';
 	import { favouriteBooksStore } from '$lib/stores/books.stores';
 	import { getBooksByBookshelf, getBooksByReadingStatus } from '$lib/firebase/bookFirestore';
-	import { getUserBookshelves } from '$lib/firebase/userFirestore';
 	import { goto } from '$app/navigation';
 	import { onDestroy } from 'svelte';
 	import { session } from '$lib/stores/session.stores';
@@ -75,6 +74,64 @@
 		$open = false;
 	}
 
+	/** TODO: Fake function for now */
+	async function handleDeleteUser() {
+		if (!userId) {
+			return;
+		}
+
+		try {
+			const response = await deleteUserAccount(userId);
+
+			if (response?.status === 'success') {
+				session.set({
+					loading: false,
+					loggedIn: false,
+					user: null
+				});
+
+				userStore.set({} as AppUser);
+
+				localStorage.removeItem('loggedIn');
+				localStorage.removeItem('appUser');
+
+				goto('/login');
+
+				addToast({
+					data: {
+						title: 'Success',
+						description: 'User deleted successfully',
+						status: 'success'
+					}
+				});
+			}
+
+			// if (response?.status === 'error') {
+			// 	editingUserProfile = false;
+			// 	$open = false;
+			// 	addToast({
+			// 		data: {
+			// 			title: 'Error',
+			// 			description: response.message,
+			// 			status: 'error'
+			// 		}
+			// 	});
+			// }
+		} catch (error) {
+			console.error('Failed to delete user:', error);
+
+			editingUserProfile = false;
+			$open = false;
+			addToast({
+				data: {
+					title: 'Error',
+					description: 'Failed to delete user',
+					status: 'error',
+				}
+			});
+		}
+	}
+
 	async function handleUpdateUser(event: CustomEvent) {
 		const formData = event.detail;
 
@@ -104,7 +161,7 @@
 					data: {
 						title: 'Success',
 						description: 'User updated successfully',
-						color: 'green'
+						status: 'success'
 					}
 				});
 			}
@@ -116,7 +173,7 @@
 					data: {
 						title: 'Error',
 						description: response.message,
-						color: 'red'
+						status: 'error'
 					}
 				});
 			}
@@ -129,7 +186,7 @@
 				data: {
 					title: 'Error',
 					description: 'Failed to update user',
-					color: 'red'
+					status: 'error',
 				}
 			});
 		}
@@ -228,13 +285,6 @@
 						{:else}
 							<p>Not reading anything at the moment.</p>
 						{/if}
-					</div>
-				</section>
-			{:else}
-				<section class="empty-library">
-					<h2>Library</h2>
-					<div class="library-link-container">
-						<a href="/profile/library" class="button button-primary">Go to Library</a>
 					</div>
 				</section>
 			{/if}
@@ -348,6 +398,7 @@
 					bookshelves={bookshelves || []}
 					on:cancel={handleCancel}
 					on:submit={handleUpdateUser}
+					on:delete={handleDeleteUser}
 				/>
 			{/if}
 		</div>

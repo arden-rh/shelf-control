@@ -34,6 +34,10 @@
 	function handleCancel() {
 		dispatch('cancel');
 	}
+
+	function handleDelete() {
+		dispatch('delete');
+	}
 </script>
 
 <form on:submit|preventDefault={handleSubmit} class="edit-user-form">
@@ -98,15 +102,22 @@
 
 	<div class="button-group">
 		<button class="button button-primary" type="submit">Save Changes</button>
+		<button class="button button-secondary button-delete" type="button" on:click={handleDelete}
+			>Delete Account</button
+		>
 		<button class="button button-secondary" type="button" on:click={handleCancel}>Cancel</button>
 	</div>
 </form>
 
 <style>
-
 	h3 {
 		font-size: 1rem;
 		text-transform: uppercase;
+	}
+
+	.button {
+		line-height: 1rem;
+		min-height: 3rem;
 	}
 
 	.edit-user-form {
@@ -129,6 +140,8 @@
 		padding: 0.5rem;
 		margin-bottom: 0.5rem;
 		flex-grow: 1;
+		width: calc(100% - 30% - 5rem);
+		font-size: 0.9rem;
 	}
 	.input-group label {
 		align-items: center;

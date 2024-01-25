@@ -89,7 +89,7 @@
 					data: {
 						title: 'Success',
 						description: 'Book updated successfully',
-						color: 'green'
+						status: 'success'
 					}
 				});
 			}
@@ -101,7 +101,7 @@
 					data: {
 						title: 'Error',
 						description: 'Failed to update user',
-						color: 'red'
+						status: 'error'
 					}
 				});
 			}
@@ -112,7 +112,7 @@
 				data: {
 					title: 'Error',
 					description: 'Failed to update user',
-					color: 'red'
+					status: 'error'
 				}
 			});
 		}
@@ -134,8 +134,8 @@
 					addToast({
 						data: {
 							title: 'Success',
-							description: 'Book deleted',
-							color: 'green'
+							description: `${book.title} has been deleted`,
+							status: 'success'
 						}
 					});
 				}
@@ -146,7 +146,7 @@
 						data: {
 							title: 'Error',
 							description: 'Failed to delete book',
-							color: 'red'
+							status: 'error'
 						}
 					});
 				}
@@ -157,7 +157,7 @@
 					data: {
 						title: 'Error',
 						description: 'Failed to delete book',
-						color: 'red'
+						status: 'error'
 					}
 				});
 			}
@@ -180,7 +180,7 @@
 						data: {
 							title: 'Success',
 							description: 'Reading status updated',
-							color: 'green'
+							status: 'success'
 						}
 					});
 				}
@@ -191,7 +191,7 @@
 					data: {
 						title: 'Error',
 						description: 'Failed to update reading status',
-						color: 'red'
+						status: 'error'
 					}
 				});
 			}

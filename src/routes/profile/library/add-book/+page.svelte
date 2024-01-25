@@ -12,6 +12,7 @@
 	import type { SessionState } from '$lib/types/session.types';
 	import type { LoggedInUser } from '$lib/types/user.types';
 	import { X } from 'lucide-svelte';
+	import { addToast } from '$lib/components/Toaster.svelte';
 
 	const q = writable('');
 	const selectedBook = writable({} as VolumeInfo);
@@ -53,7 +54,13 @@
 		const response = await createLibraryBook(userId, book);
 
 		if (response?.success) {
-			console.log('Book added successfully:');
+			addToast({
+				data: {
+					title: 'Book added',
+					description: `${selectedBookValue.title} has been added to your library`,
+					status: 'success'
+				}
+			});
 
 			goto(`/profile/library?bookId=${response.bookId}`);
 		} else {
@@ -108,9 +115,8 @@
 										{book.volumeInfo.authors ? book.volumeInfo.authors.join(', ') : 'N/A'}
 									</h4>
 									<h4>
-										<span>Published:</span> {book.volumeInfo.publishedDate
-											? book.volumeInfo.publishedDate
-											: 'Unknown'}
+										<span>Published:</span>
+										{book.volumeInfo.publishedDate ? book.volumeInfo.publishedDate : 'Unknown'}
 									</h4>
 								</div>
 							</button>
@@ -189,9 +195,7 @@
 				{/if}
 				<div class="dialog-buttons">
 					<button class="button button-primary" on:click={() => addBook()}>Add book</button>
-					<button use:melt={$close} class="close-button button">
-						Close
-					</button>
+					<button use:melt={$close} class="close-button button"> Close </button>
 				</div>
 			</div>
 		{/if}

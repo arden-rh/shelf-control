@@ -154,18 +154,6 @@
 
 <style>
 
-	.button-delete {
-		background-color: var(--primary-grey);
-		border-color: var(--secondary-grey);
-		color: var(--primary-black);
-	}
-
-	.button-delete:hover {
-		background-color: var(--primary-colour-purple);
-		border-color: var(--accent-dark-purple);
-		color: var(--primary-white);
-	}
-
 	.edit-book-form {
 		display: flex;
 		flex-direction: column;

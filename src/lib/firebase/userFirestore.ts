@@ -84,3 +84,21 @@ export const getUserBookshelves = async (userId: string) => {
 		throw error;
 	}
 };
+
+/** Delete a User */
+export const deleteUserAccount = async (userId: string) => {
+
+	if (browser) {
+		await initializeFirebase().catch(console.error);
+	}
+
+	if (!db) {
+		console.warn('Firestore is not initialized');
+		return undefined;
+	}
+
+	return { status: 'success', message: 'User deleted' };
+
+	/** TODO */
+
+};
