@@ -67,8 +67,31 @@ export const getBooksByBookshelf = async (userId: string, bookshelf: string) => 
 	}
 };
 
+export const getBooksByReadingStatus = async (userId: string, readingStatus: string) => {
+	
+	if (browser) {
+		await initializeFirebase().catch(console.error);
+	}
+
+	if (!db) {
+		console.warn('Firestore is not initialized');
+		return undefined;
+	}
+
+	try {
+		const userLibraryRef = collection(db, 'users', userId, 'library');
+		const q = query(userLibraryRef, where('readingStatus', '==', readingStatus));
+		const querySnapshot = await getDocs(q);
+
+		return querySnapshot.docs.map((doc) => doc.data()) as LibraryBookWithId[];
+	} catch (error) {
+		console.error('Error fetching books for user:', error);
+		return [];
+	}
+}
+
 /**
- * Updates a book with new bookshelves information.
+ * Updates a book and a user with new bookshelves information.
  *
  * @param {string} userId - The ID of the user who owns the book.
  * @param {string} bookId - The ID of the book to update.
@@ -80,6 +103,10 @@ export const addUniqueBookshelvesAndUpdateUser = async (
 	bookId: string,
 	newBookshelves: string[]
 ) => {
+
+	if (newBookshelves[0] === '') {
+		return;
+	}
 
     if (browser) {
         await initializeFirebase().catch(console.error);

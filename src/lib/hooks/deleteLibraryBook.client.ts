@@ -1,15 +1,14 @@
-import { doc, updateDoc } from 'firebase/firestore';
+import { deleteDoc, doc } from 'firebase/firestore';
 import { FirebaseError } from '@firebase/util';
 import { getUserLibraryCollection } from '$lib/firebase/libraryFirestore';
 import { writable } from 'svelte/store';
-import type { LibraryBookWithId } from '$lib/types/books.types';
 
 export const errorMsg = writable<string | null>(null);
 export const error = writable<boolean>(false);
 export const success = writable<boolean>(false);
 export const loading = writable<boolean>(false);
 
-export async function editLibraryBook(userId: string, data: LibraryBookWithId) {
+export async function deleteLibraryBook(userId: string, bookId: string) {
 	success.set(false);
 	error.set(false);
 	errorMsg.set(null);
@@ -23,12 +22,12 @@ export async function editLibraryBook(userId: string, data: LibraryBookWithId) {
 			throw new Error('Book collection is not initialized');
 		}
 
-		const docRef = doc(libraryCollection, data._id);
+		const docRef = doc(libraryCollection, bookId);
 
 		try {
-			await updateDoc(docRef, { ...data });
+			await deleteDoc(docRef);
 			success.set(true);
-			return { status: 'success', message: 'Book updated successfully' };
+			return { status: 'success', message: 'Book deleted successfully' };
 		} catch (e) {
 			console.log('error', e);
 		}
@@ -36,10 +35,8 @@ export async function editLibraryBook(userId: string, data: LibraryBookWithId) {
 		error.set(true);
 
 		if (e instanceof FirebaseError) {
-			console.error('Error updating book FB:', e);
 			errorMsg.set(e.message);
 		} else if (e instanceof Error) {
-			console.error('Error updating book:', e);
 			errorMsg.set(e.message);
 		} else {
 			errorMsg.set('Something went wrong, please try again');

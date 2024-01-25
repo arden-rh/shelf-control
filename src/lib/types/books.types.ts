@@ -9,15 +9,12 @@ export interface LibraryBook {
         smallThumbnail?: string;
         thumbnail?: string;
     };
-    industryIdentifiers: {
-        type: string;
-        identifier: string;
-    }[];
+    isbn?: string;
     pageCount?: number;
-    printType: string;
+    printType?: string;
     publishedDate?: string;
     publisher?: string;
-    readingStatus?: 'want-to-read' | 'reading' | 'read';
+    readingStatus: 'to-read' | 'reading' | 'read';
     title: string;    
     userId: string;
 }

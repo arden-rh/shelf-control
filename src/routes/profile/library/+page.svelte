@@ -78,9 +78,6 @@
 
 	/** Book Page functions */
 	async function fetchBook() {
-		console.log('fetching book');
-		console.log(user);
-		console.log(bookId);
 
 		loading = true;
 		if (user && user.uid && bookId) {
@@ -88,7 +85,6 @@
 				const response = await getUserLibraryBook(user.uid, bookId);
 				book = response;
 				loading = false;
-				console.log(book);
 			} catch (error) {
 				console.error(error);
 			}
@@ -131,10 +127,10 @@
 
 <section class={staticSite ? 'staticSite' : ''}>
 	<div class="page-header">
-		<h1>Library</h1>
+		<a href="library"><h1>Library</h1></a>
 	</div>
 	{#if bookId && book && !loading}
-		<BookPage {book} />
+		<BookPage {book} {user} />
 	{:else if bookshelf && !loading}
 		<p>hej</p>
 	{:else if noQuery && !loading}
@@ -146,6 +142,14 @@
 					<a href="/profile/add-bookshelf" class="button button-secondary">Add Bookshelf</a>
 				</div>
 			{/if}
+			<div class="library-actions">
+				<a href="/profile/library/add-book" class="button button-secondary">Add book</a>
+				<button class="button button-secondary">Add bookshelf</button>
+				<!-- <button on:click={editBookShelves} use:melt={$trigger} class="button button-secondary"
+					>Edit Bookshelves</button
+				> -->
+				<button class="button button-secondary">Delete Book</button>
+			</div>
 			<div class="grid-container">
 				{#each books as book}
 					<div class="grid-item">

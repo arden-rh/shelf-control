@@ -111,12 +111,20 @@
 	<main class="main-container">
 		<slot />
 	</main>
+	<footer class="footer-container">
+		<div class="footer-content">
+			<u class="footer-links">
+				<li><a href="/">Home</a></li>
+				<li><a href="/profile">Profile</a></li>
+				<li><a href="/profile/library">Library</a></li>
+			</u>
+		</div>
+	</footer>
 </div>
 
 <style>
 	@import '../app.pcss';
 	@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap');
-	/* @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300..700&display=swap'); */
 	@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;500;600;700&display=swap');
 
 	:global(body) {
@@ -133,6 +141,50 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
+	}
+
+	footer {
+		background-color: var(--primary-colour-purple);
+		color: var(--primary-white);
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.footer-container {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin: 2rem 0;
+	}
+	.footer-content {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+		max-width: 800px;
+	}
+
+	.footer-links {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+		gap: 1rem;
+		list-style: none;
+		font-family: var(--header-font);
+		text-transform: uppercase;
+		text-decoration: none;
+	}
+
+	.footer-links li a {
+		font-size: 0.75rem;
+	}
+
+	.footer-links li a:hover {
+		color: var(--accent-pink-purple);
 	}
 
 	.nav-container {
@@ -161,7 +213,7 @@
 	}
 
 	.logotype:hover {
-		color: var(--primary-grey);
+		color: var(--accent-pink-purple);
 	}
 
 	.layout-container {
@@ -182,6 +234,9 @@
 	}
 
 	@media (min-width: 768px) {
+		.footer-links li a {
+			font-size: 0.9rem;
+		}
 		.nav-container {
 			padding: 0 2rem;
 		}

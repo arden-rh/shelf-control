@@ -3,16 +3,18 @@ import type { LibraryBookWithoutUserId } from "$lib/types/books.types";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function toLibraryBook(source: any): LibraryBookWithoutUserId {
     return {
-        title: source.title,
         authors: source.authors,
-        publisher: source.publisher,
-        publishedDate: source.publishedDate,
-        description: source.description,
-        pageCount: source.pageCount,
-        categories: source.categories,
-        imageLinks: source.imageLinks,
-        industryIdentifiers: source.industryIdentifiers,
-        language: source.language,
         canonicalVolumeLink: source.canonicalVolumeLink,
+        categories: source.categories,
+        description: source.description,
+        imageLinks: source.imageLinks,
+        isbn: source.industryIdentifiers[0].identifier,
+        language: source.language,
+        pageCount: source.pageCount,
+        printType: source.printType,
+        publishedDate: source.publishedDate,
+        publisher: source.publisher,
+        readingStatus: 'to-read',
+        title: source.title
     };
 }

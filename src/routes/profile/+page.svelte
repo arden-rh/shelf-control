@@ -8,11 +8,11 @@
 	import { writable } from 'svelte/store';
 	import { onDestroy } from 'svelte';
 	import { addToast } from '$lib/components/Toaster.svelte';
-	import { getBooksByBookshelf } from '$lib/firebase/bookFirestore';
+	import { getBooksByBookshelf, getBooksByReadingStatus } from '$lib/firebase/bookFirestore';
 	import { getUserBookshelves } from '$lib/firebase/userFirestore';
 	import { updateUser } from '$lib/firebase/userFirestore';
 	import EditUserForm from '$lib/components/EditUserForm.svelte';
-	import Fa from 'svelte-fa'
+	import Fa from 'svelte-fa';
 	import type { LibraryBookWithId } from '$lib/types/books.types';
 	import type { AppUser, LoggedInUser } from '$lib/types/user.types';
 	import type { SessionState } from '$lib/types/session.types';
@@ -21,6 +21,7 @@
 	const selectedBook = writable({} as LibraryBookWithId);
 	let books: LibraryBookWithId[] = [];
 	let bookshelves: string[] = [];
+	let currentlyReadingBooks: LibraryBookWithId[] = [];
 	let user: LoggedInUser | null = null;
 	let appUser: AppUser | undefined;
 	let displayName: string | undefined = undefined;
@@ -60,6 +61,7 @@
 		console.log('appUser', appUser);
 		getFavouriteShelf();
 		getAllBookshelves();
+		getAllCurrentlyReadingBooks();
 	}
 
 	function openBook(book: LibraryBookWithId) {
@@ -110,6 +112,8 @@
 			}
 
 			if (response?.status === 'error') {
+				editingUserProfile = false;
+				$open = false;
 				addToast({
 					data: {
 						title: 'Error',
@@ -120,6 +124,9 @@
 			}
 		} catch (error) {
 			console.error('Failed to update user:', error);
+
+			editingUserProfile = false;
+			$open = false;
 			addToast({
 				data: {
 					title: 'Error',
@@ -151,6 +158,17 @@
 			}
 		}
 	}
+
+	async function getAllCurrentlyReadingBooks() {
+		if (appUser?.uid) {
+			const response = await getBooksByReadingStatus(appUser.uid, 'reading');
+
+			if (response) {
+				currentlyReadingBooks = response;
+				loading = false;
+			}
+		}
+	}
 </script>
 
 <section>
@@ -159,13 +177,14 @@
 			<h1>Profile Page</h1>
 		</div>
 		<div class="profile-container">
-			<div class="profile-actions">
-				<a href="/profile/library/add-book" class="button button-primary">Add a book</a>
-				<a href="/profile/library" class="button button-primary">Library</a>
-				<button on:click={editUser} use:melt={$trigger} class="button button-primary"
-					>Edit profile</button
-				>
-			</div>
+			{#if appUser}
+				<div class="profile-actions">
+					<a href="/profile/library/add-book" class="button button-primary">Add a book</a>
+					<button on:click={editUser} use:melt={$trigger} class="button button-primary"
+						>Edit profile</button
+					>
+				</div>
+			{/if}
 			<section class="profile-info">
 				<div class="profile-image">
 					<img src="https://via.placeholder.com/150" alt="profile picture" />
@@ -176,56 +195,78 @@
 							<li>
 								<span>Display name:</span>{displayName ? displayName : 'Not chosen'}
 							</li>
-							{#if appUser.favouriteBook}
-								<li>
-									<span>Favourite book:</span>{appUser.favouriteBook}
-								</li>
-							{/if}
-							{#if appUser.favouriteAuthor}
-								<li>
-									<span>Favourite author:</span>{appUser.favouriteAuthor}
-								</li>
-							{/if}
-							{#if appUser.favouriteGenre}
-								<li>
-									<span>Favourite genre:</span>{appUser.favouriteGenre}
-								</li>
+							{#if appUser.privateInfo?.favourites === 'all' || appUser.privateInfo?.favourites === 'users'}
+								{#if appUser.favouriteBook}
+									<li>
+										<span>Favourite book:</span>{appUser.favouriteBook}
+									</li>
+								{/if}
+								{#if appUser.favouriteAuthor}
+									<li>
+										<span>Favourite author:</span>{appUser.favouriteAuthor}
+									</li>
+								{/if}
+								{#if appUser.favouriteGenre}
+									<li>
+										<span>Favourite genre:</span>{appUser.favouriteGenre}
+									</li>
+								{/if}
 							{/if}
 						{/if}
 					</ul>
 				</div>
 			</section>
-			<section class="bookshelves">
-				<h2>Bookshelves</h2>
-				{#if appUser?.favouriteShelf}
-					<h3>Favourite shelf: {appUser?.favouriteShelf}</h3>
-					<div class="bookshelves-container">
-						{#if books.length > 0 && !loading}
-							{#each books as book}
-								<button class="book button" on:click={() => openBook(book)} use:melt={$trigger}>
-									<h4>{book.title}</h4>
-								</button>
-							{/each}
-						{:else if loading}
-							<p>Loading...</p>
-						{:else}
-							<p>No books added to this bookshelf yet.</p>
-						{/if}
-					</div>
-				{/if}
-				{#if bookshelves.length > 0}
-					<h3 class="second">Other bookshelves</h3>
-					<div class="bookshelves-container second">
-						{#each bookshelves as bookshelf}
-							<a class="button button-secondary" href={`/profile/library?bookshelf=${bookshelf}`}>
-								<h4>{bookshelf}</h4>
-							</a>
+			<section class="currently-reading">
+				<h2>Currently Reading</h2>
+				<div class="currently-reading-container">
+					{#if currentlyReadingBooks.length > 0}
+						{#each currentlyReadingBooks as book}
+							<button class="reading-book" on:click={() => openBook(book)} use:melt={$trigger}>
+								<img src={book.imageLinks?.smallThumbnail} alt={`Book over of ${book.title}`} />
+								<div class="cover-overlay"></div>
+							</button>
 						{/each}
-					</div>
-				{:else}
-					<p>No bookshelves added yet.</p>
-				{/if}
+					{:else}
+						<p>Not reading anything at the moment.</p>
+					{/if}
+				</div>
 			</section>
+			{#if appUser?.privateInfo?.bookshelves === 'all' || appUser?.privateInfo?.bookshelves === 'users'}
+				<section class="bookshelves">
+					<h2>Bookshelves</h2>
+					{#if appUser?.favouriteShelf}
+						<h3>Favourite shelf: {appUser?.favouriteShelf}</h3>
+						<div class="bookshelves-container">
+							{#if books.length > 0 && !loading}
+								{#each books as book}
+									<button class="book button" on:click={() => openBook(book)} use:melt={$trigger}>
+										<h4>{book.title}</h4>
+									</button>
+								{/each}
+							{:else if loading}
+								<p>Loading...</p>
+							{:else}
+								<p>No books added to this bookshelf yet.</p>
+							{/if}
+						</div>
+					{/if}
+					{#if bookshelves.length > 0}
+						<h3 class="second">All bookshelves</h3>
+						<div class="all-bookshelves-container">
+							{#each bookshelves.sort() as bookshelf}
+								<a class="bookshelves-container" href={`/profile/library?bookshelf=${bookshelf}`}>
+									<h4>{bookshelf}</h4>
+								</a>
+							{/each}
+						</div>
+					{:else}
+						<p>No bookshelves added yet.</p>
+					{/if}
+				</section>
+				<div class="library-link-container">
+					<a href="/profile/library" class="button button-primary">Go to Library</a>
+				</div>
+			{/if}
 		</div>
 	</div>
 </section>
@@ -330,27 +371,73 @@
 	}
 
 	h2 {
-		margin-bottom: 0.5rem;
+		margin-bottom: 0.75rem;
 		line-height: 1.75rem;
+		border-bottom: 8px solid var(--secondary-colour-purple);
+		box-shadow: inset 0 -4px 0px 0px var(--accent-pink-purple);
+		padding-bottom: 0.5rem;
 	}
 
 	h3 {
-		margin-bottom: 0.5rem;
+		margin-bottom: 0.75rem;
+		font-size: 1.2rem;
 	}
 	h3.second {
 		margin-top: 2rem;
+		margin-bottom: 0;
 	}
 
 	h4 {
 		font-size: 0.8rem;
 	}
 
+	.all-bookshelves-container {
+		display: flex;
+		flex-direction: row;
+		align-items: flex-start;
+		justify-content: space-between;
+		width: 100%;
+		padding: 0;
+		margin-bottom: 2rem;
+		flex-wrap: wrap;
+	}
+
+	.all-bookshelves-container a {
+		align-items: center;
+		font-family: var(--header-font);
+		display: flex;
+		letter-spacing: 0.075rem;
+		padding: 0 0.75rem;
+		text-transform: uppercase;
+		font-weight: 500;
+		max-width: calc(50% - 0.5rem);
+		margin-top: 0.75rem;
+	}
+
+	.all-bookshelves-container a:hover {
+		border-color: var(--accent-blue-grey);
+		box-shadow: inset -8px -8px 0px 0px var(--accent-dark-blue-grey);
+		/* color: var(--primary-white); */
+		/* background-color: var(--secondary-colour-purple); */
+	}
+
+	.all-bookshelves-container a:hover::before,
+	.all-bookshelves-container a:hover::after {
+		background-color: var(--accent-dark-blue-grey);
+	}
+
+	.all-bookshelves-container h4 {
+		font-size: 0.9rem;
+	}
 	.book {
 		writing-mode: vertical-rl;
 		text-orientation: sideways;
 		height: fit-content;
+		max-height: 200px;
+		overflow: hidden;
 		padding: 1rem 0.5rem;
 		border-radius: 0;
+		position: relative;
 	}
 
 	.book:nth-child(3n + 1) {
@@ -359,8 +446,9 @@
 	}
 
 	.book:nth-child(3n + 1):hover,
-	.book:nth-child(3n + 2):hover {
-		background-color: var(--secondary-grey);
+	.book:nth-child(3n + 2):hover,
+	.book:nth-child(3n + 3):hover {
+		background-color: var(--accent-dark-blue-grey);
 		color: var(--primary-black);
 	}
 
@@ -370,7 +458,7 @@
 	}
 
 	.book:nth-child(3n + 3) {
-		background-color: var(--accent-light-blue-grey);
+		background-color: var(--secondary-grey);
 		color: var(--primary-black);
 	}
 
@@ -381,6 +469,7 @@
 		justify-content: center;
 		width: 100%;
 		padding: 0;
+		margin-left: 0.5rem;
 	}
 
 	.bookshelves-container {
@@ -388,20 +477,19 @@
 		flex-direction: row;
 		align-items: flex-end;
 		justify-content: flex-end;
-		width: 98%;
+		width: 100%;
 		border: 12px solid var(--secondary-colour-purple);
 		box-shadow: inset -8px -8px 0px 0px rgba(178, 152, 220, 1);
 		position: relative;
 		padding: 0.8rem 0 0;
 		padding: 0.8rem 1.25rem 1.25rem;
-		margin-left: 0.5rem;
 	}
 
 	.bookshelves-container::before,
 	.bookshelves-container::after {
 		content: '';
 		position: absolute;
-		background-color: var(--accent-purple);
+		background-color: var(--accent-pink-purple);
 	}
 
 	.bookshelves-container::before {
@@ -433,6 +521,31 @@
 	.button-secondary:hover {
 		background-color: var(--primary-colour-purple);
 		color: var(--primary-white);
+	}
+
+	.currently-reading {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		justify-content: center;
+		width: 100%;
+		padding: 0;
+		margin: 0 0 2rem 0.5rem;
+	}
+
+	.library-link-container {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: flex-end;
+		width: 100%;
+		margin-bottom: 5rem;
+	}
+
+	.library-link-container .button {
+		height: fit-content;
+		padding: 0.4rem 0.8rem;
+		margin-right: 0.5rem;
 	}
 
 	.profile-container {
@@ -469,7 +582,7 @@
 
 	.profile-details {
 		border: 12px solid var(--secondary-colour-purple);
-		box-shadow: inset -8px -8px 0px 0px rgba(178, 152, 220, 1);
+		box-shadow: inset -8px -8px 0px 0px var(--accent-pink-purple);
 		position: relative;
 		padding: 0.8rem 1rem 1rem;
 		margin-left: 2rem;
@@ -480,13 +593,13 @@
 	.profile-details::after {
 		content: '';
 		position: absolute;
-		background-color: var(--accent-purple);
+		background-color: var(--accent-pink-purple);
 	}
 
 	.profile-details::before {
 		position: absolute;
 		content: '';
-		background-color: var(--accent-purple);
+		background-color: var(--accent-pink-purple);
 		top: -19px;
 		left: -20px;
 		right: 0;
@@ -499,7 +612,7 @@
 	.profile-details::after {
 		position: absolute;
 		content: '';
-		background-color: var(--accent-purple);
+		background-color: var(--accent-pink-purple);
 		top: -12px;
 		left: -20px;
 		bottom: 0;
@@ -514,30 +627,23 @@
 		flex-direction: row;
 		align-items: center;
 		justify-content: flex-end;
-		margin-bottom: 1rem;
+		margin-bottom: 2rem;
 		align-self: flex-end;
-		background-color: var(--secondary-colour-purple);
-		border-radius: 5px;
-		overflow: hidden;
 	}
 	.profile-actions .button {
 		font-size: 0.7rem;
 		height: fit-content;
-		padding: 0.5rem 1rem;
-		border-radius: 0;
-		background-color: var(--accent-purple);
-		border: none;
-		color: var(--primary-colour-purple);
-	}
-
-	.profile-actions .button:nth-child(2) {
-		border-left: 1px solid var(--accent-light-blue-grey);
-		border-right: 1px solid var(--accent-light-blue-grey);
+		padding: 0.4rem 0.8rem;
+		background-color: var(--accent-blue-grey);
+		border: 4px solid var(--accent-dark-blue-grey);
+		color: var(--primary-black);
+		margin-right: 0.5rem;
+		box-shadow: 2px 2px 2px 0px rgba(0, 0, 0, 0.5);
 	}
 
 	.profile-actions .button:hover {
-		background-color: var(--primary-colour-purple);
-		color: var(--primary-white);
+		background-color: var(--secondary-colour-purple);
+		border-color: var(--accent-pink-purple);
 	}
 
 	.profile-page-container {
@@ -550,8 +656,64 @@
 		height: 100%;
 	}
 
-	.bookshelves-container.second {
-		margin: 0 0 5rem 0.5rem;
-		justify-content: flex-start;
+	.reading-book {
+		position: relative;
+		cursor: pointer;
+		border: 4px solid var(--primary-colour-purple);
+		box-shadow: 2px 2px 2px 0px rgba(0, 0, 0, 0.4);
+	}
+
+	.reading-book:hover {
+		border-color: var(--accent-dark-blue-grey);
+	}
+
+	.reading-book img {
+		max-height: 150px;
+		object-fit: contain;
+		object-position: center;
+	}
+
+	.cover-overlay {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		width: 100%;
+		height: 100%;
+		background-image: linear-gradient(
+			to bottom,
+			rgba(52, 34, 138, 0.5),
+			rgba(52, 34, 138, 0.25),
+			rgba(52, 34, 138, 0.5)
+		);
+		transition: opacity 0.3 ease;
+	}
+
+	.cover-overlay:hover {
+		opacity: 0;
+	}
+
+	@media (min-width: 590px) {
+		.all-bookshelves-container a {
+			max-width: calc(33% - 0.5rem);
+			font-size: 1rem;
+		}
+	}
+
+	@media (min-width: 768px) {
+		h2 {
+			font-size: 2.5rem;
+			padding-bottom: 0.75rem;
+		}
+
+		li span {
+			display: inline;
+			margin-right: 0.25rem;
+		}
+
+		.all-bookshelves-container a {
+			max-width: calc(25% - 1rem);
+		}
 	}
 </style>
