@@ -117,7 +117,9 @@
 			<label for="bookshelves">Bookshelves</label>
 			<div class="input-with-help-text">
 				<input id="bookshelves" bind:value={bookshelvesString} placeholder="Bookshelves" />
-				<small>Separate bookshelves with a forward slash (/) and use a dash (-) instead of space</small>
+				<small
+					>Separate bookshelves with a forward slash (/) and use a dash (-) instead of space</small
+				>
 			</div>
 		</span>
 
@@ -142,21 +144,34 @@
 
 		<div class="button-group">
 			<button class="button button-primary" type="submit">Save Changes</button>
-			<button class="button button-secondary" type="button" on:click={handleCancel}>Cancel</button>
 			<button class="button button-secondary button-delete" type="button" on:click={handleDelete}
-				>Delete</button
+				>Delete Book</button
 			>
+			<button class="button button-secondary" type="button" on:click={handleCancel}>Cancel</button>
 		</div>
 	</div>
 </form>
 
 <style>
+
+	.button-delete {
+		background-color: var(--primary-grey);
+		border-color: var(--secondary-grey);
+		color: var(--primary-black);
+	}
+
+	.button-delete:hover {
+		background-color: var(--primary-colour-purple);
+		border-color: var(--accent-dark-purple);
+		color: var(--primary-white);
+	}
+
 	.button-group {
 		display: flex;
 		flex-direction: row;
 		justify-content: flex-end;
 		gap: 0.5rem;
-		margin-top: 1rem;
+		margin-top: 1.5rem;
 	}
 
 	.edit-book-form {
@@ -185,7 +200,6 @@
 	.input-group label {
 		align-items: center;
 		justify-content: center;
-		border-radius: 5px;
 		font-family: var(--header-font);
 		font-size: 0.8rem;
 		display: flex;
@@ -205,13 +219,11 @@
 	.input-group select {
 		border: 2px solid var(--primary-colour-purple);
 		background-color: var(--accent-light-blue-grey);
-		border-radius: 5px;
 		padding: 0.5rem;
 		margin-bottom: 0.5rem;
 		width: 50%;
 		font-size: 0.8rem;
 	}
-
 
 	.input-group span {
 		display: flex;
@@ -247,5 +259,4 @@
 		margin-bottom: 0.5rem;
 		max-width: 80%;
 	}
-
 </style>

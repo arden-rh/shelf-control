@@ -1,50 +1,73 @@
 <script lang="ts">
 	import { addToast } from '$lib/components/Toaster.svelte';
 	import { createDialog, melt } from '@melt-ui/svelte';
+	import { deleteLibraryBook } from '$lib/hooks/deleteLibraryBook.client';
 	import { editLibraryBook } from '$lib/hooks/editLibraryBook.client';
 	import { faRectangleXmark } from '@fortawesome/free-solid-svg-icons';
 	import { fetchGoogleBooks } from '$lib/queries/books';
 	import { get, writable } from 'svelte/store';
-	import {
-		addUniqueBookshelvesAndUpdateUser,
-		getUserLibraryBook
-	} from '$lib/firebase/bookFirestore';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import { session } from '$lib/stores/session';
 	import { toLibraryBook } from '$lib/utility/toLibraryBook';
 	import { useQuery } from '@sveltestack/svelte-query';
+	import {
+		addUniqueBookshelvesAndUpdateUser,
+		getUserLibraryBook,
+		updateLibraryBookReadingStatus
+	} from '$lib/firebase/bookFirestore';
+	import { X } from 'lucide-svelte';
 	import EditBookForm from './EditBookForm.svelte';
+	import EditBookshelvesForm from './EditBookshelvesForm.svelte';
 	import Fa from 'svelte-fa';
 	import type { LibraryBookWithId } from '$lib/types/books.types';
 	import type { LoggedInUser } from '$lib/types/user.types';
 	import type { SessionState } from '$lib/types/session.types';
-	import { deleteLibraryBook } from '$lib/hooks/deleteLibraryBook.client';
 
 	export let book: LibraryBookWithId;
 	export let user: LoggedInUser | null = null;
+	export const bookStore = writable({} as LibraryBookWithId);
+	let deletingBook = false;
 	let editingLibraryBook = false;
 	let editingBookshelves = false;
+	let updatingReadingStatus = false;
 
 	const {
 		elements: { trigger, portalled, overlay, content, title, description, close },
 		states: { open }
 	} = createDialog();
 
+	bookStore.set(book);
+
+	$: if (!$open) {
+		deletingBook = false;
+		editingLibraryBook = false;
+		editingBookshelves = false;
+		updatingReadingStatus = false;
+	}
+
+	$: book = $bookStore;
+
+
 	function editBook() {
 		editingLibraryBook = true;
 	}
 
+	function editBookshelves() {
+		editingBookshelves = true;
+	}
+
 	function handleCancel() {
-		editingLibraryBook = false;
 		$open = false;
 	}
 
 	function handleDelete() {
-		deleteBook();
-		editingLibraryBook = false;
-		$open = false;
+		deletingBook = true;
+	}
+
+	function updateReadingStatus() {
+		updatingReadingStatus = true;
 	}
 
 	async function handleUpdateBook(event: CustomEvent) {
@@ -64,6 +87,11 @@
 
 			if (response?.status === 'success') {
 				await addUniqueBookshelvesAndUpdateUser(user.uid, book._id, formData.bookshelves);
+
+				bookStore.set({
+					...book,
+					...formData
+				} as LibraryBookWithId)
 
 				editingLibraryBook = false;
 				$open = false;
@@ -145,14 +173,32 @@
 		}
 	}
 
-	async function editBookShelves() {
-		editingBookshelves = true;
-		if (user && user.uid && bookId) {
+	async function updateBookReadingStatus() {
+		if (user && user.uid && book._id) {
 			try {
-				const response = await updateUserLibraryBookShelves(user.uid, bookId, book);
-				console.log(response);
+				const response = await updateLibraryBookReadingStatus(user.uid, book._id, book.readingStatus);
+				if (response?.status === 'success') {
+					updatingReadingStatus = false;
+					$open = false;
+
+					addToast({
+						data: {
+							title: 'Success',
+							description: 'Reading status updated',
+							color: 'green'
+						}
+					});
+				}
 			} catch (error) {
-				console.error(error);
+				updatingReadingStatus = false;
+				$open = false;
+				addToast({
+					data: {
+						title: 'Error',
+						description: 'Failed to update reading status',
+						color: 'red'
+					}
+				});
 			}
 		}
 	}
@@ -166,10 +212,10 @@
 			<button on:click={editBook} use:melt={$trigger} class="button button-primary"
 				>Edit Book</button
 			>
-			<button on:click={editBookShelves} use:melt={$trigger} class="button button-primary"
+			<button on:click={editBookshelves} use:melt={$trigger} class="button button-primary"
 				>Edit Bookshelves</button
 			>
-			<button on:click={deleteBook} class="button button-primary">Delete Book</button>
+			<button on:click={handleDelete} use:melt={$trigger} class="button button-primary">Delete Book</button>
 		</div>
 		<div class="book-info-container">
 			<div class="book-info">
@@ -223,7 +269,7 @@
 						</li>
 					</ul>
 				</div>
-				<div class="reading-status">Reading status: {book.readingStatus}</div>
+				<button on:click={updateReadingStatus} use:melt={$trigger} class="button reading-status">Reading status: {book.readingStatus}</button>
 			</div>
 			<div class="book-description">
 				<p>{book.description}</p>
@@ -240,7 +286,26 @@
 				use:melt={$content}
 			>
 				{#if editingBookshelves}
-					<div>Editing bookshelves</div>
+					<EditBookshelvesForm 
+						bookshelves={book.bookshelves}
+						on:cancel={handleCancel}
+						on:save={handleUpdateBook}
+					/>
+				{:else if updatingReadingStatus}
+					<div class="update-reading-status-form">
+						<form on:submit|preventDefault={updateBookReadingStatus}>
+							<label for="reading-status">Reading Status</label>
+							<select id="reading-status" bind:value={book.readingStatus}>
+								<option value="to-read">To read</option>
+								<option value="reading">Reading</option>
+								<option value="read">Read</option>
+							</select>
+							<div class="button-group">
+								<button class="button button-primary" type="submit">Save Changes</button>
+								<button class="button button-secondary" type="button" on:click={handleCancel}>Cancel</button>
+							</div>
+						</form>
+					</div>
 				{:else if editingLibraryBook}
 					<EditBookForm
 						title={book.title}
@@ -260,6 +325,14 @@
 						on:submit={handleUpdateBook}
 						on:delete={handleDelete}
 					/>
+					{:else if deletingBook}
+					<form on:submit|preventDefault={deleteBook}>
+						<h3>Are you sure you want to delete this book?</h3>
+						<div class="button-group">
+							<button class="button button-primary" type="submit">Yes</button>
+							<button class="button button-secondary" type="button" on:click={handleCancel}>No</button>
+						</div>
+					</form>
 				{/if}
 			</div>
 		{/if}
@@ -277,6 +350,20 @@
 		text-transform: uppercase;
 		font-size: 1.5rem;
 		align-self: flex-start;
+	}
+
+	h3 {
+		font-size: 1rem;
+		text-transform: uppercase;
+	}
+
+
+	.button-group {
+		display: flex;
+		flex-direction: row;
+		justify-content: flex-end;
+		gap: 0.5rem;
+		margin-top: 1rem;
 	}
 	.book-image {
 		width: fit-content;
@@ -352,7 +439,6 @@
 		font-size: 0.9rem;
 		background-color: var(--primary-white);
 		padding: 1rem;
-		/* box-shadow: 2px 2px 2px 0px rgba(0, 0, 0, 0.6); */
 	}
 
 	.book-details span {
@@ -373,15 +459,53 @@
 
 	.reading-status {
 		font-size: 0.9rem;
-		font-weight: 400;
-		letter-spacing: 0.03rem;
-		font-family: var(--header-font);
-		text-transform: uppercase;
 		background-color: var(--primary-grey);
 		width: 100%;
 		padding: 0.5rem;
 		box-shadow: 2px 2px 2px 0px rgba(0, 0, 0, 0.6);
 	}
+
+	.reading-status:hover {
+		background-color: var(--primary-colour-purple);
+		color: var(--primary-white);
+	}
+
+	.update-reading-status-form {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 1rem;
+		width: 100%;
+	}
+
+	.update-reading-status-form label {
+		align-items: center;
+		justify-content: center;
+		font-family: var(--header-font);
+		font-size: 0.8rem;
+		display: flex;
+		height: 2.75rem;
+		letter-spacing: 0.075rem;
+		text-transform: uppercase;
+		border: 2px solid var(--primary-grey);
+		color: var(--primary-black);
+		font-weight: 400;
+		background-color: var(--primary-grey);
+		min-width: 35%;
+		flex: 0 0 auto;
+		margin-bottom: 0.5rem;
+	}
+
+	.update-reading-status-form select {
+		border: 2px solid var(--primary-colour-purple);
+		background-color: var(--accent-light-blue-grey);
+		padding: 0.5rem;
+		margin-bottom: 0.5rem;
+		width: 100%;
+		font-size: 0.9rem;
+	}
+
 
 	@media (min-width: 768px) {
 

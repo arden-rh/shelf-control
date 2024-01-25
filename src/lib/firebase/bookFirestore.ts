@@ -9,6 +9,7 @@ import {
 	getDoc,
 	getDocs,
 	query,
+	updateDoc,
 	where,
 	writeBatch
 } from 'firebase/firestore';
@@ -19,10 +20,9 @@ import type { LibraryBookWithId } from '$lib/types/books.types';
 
 /** Get One Library Book */
 export const getUserLibraryBook = async (userId: string, bookId: string) => {
-
-    if (browser) {
-        await initializeFirebase().catch(console.error);
-    }
+	if (browser) {
+		await initializeFirebase().catch(console.error);
+	}
 
 	try {
 		const libraryCollectionRef = await getUserLibraryCollection(userId);
@@ -45,10 +45,9 @@ export const getUserLibraryBook = async (userId: string, bookId: string) => {
 
 /** Get all Books with the same 'bookshelf' tag */
 export const getBooksByBookshelf = async (userId: string, bookshelf: string) => {
-
-    if (browser) {
-        await initializeFirebase().catch(console.error);
-    }
+	if (browser) {
+		await initializeFirebase().catch(console.error);
+	}
 
 	if (!db) {
 		console.warn('Firestore is not initialized');
@@ -68,7 +67,6 @@ export const getBooksByBookshelf = async (userId: string, bookshelf: string) => 
 };
 
 export const getBooksByReadingStatus = async (userId: string, readingStatus: string) => {
-	
 	if (browser) {
 		await initializeFirebase().catch(console.error);
 	}
@@ -88,7 +86,60 @@ export const getBooksByReadingStatus = async (userId: string, readingStatus: str
 		console.error('Error fetching books for user:', error);
 		return [];
 	}
+};
+
+export const updateLibraryBookReadingStatus = async (
+	userId: string,
+	bookId: string,
+	readingStatus: string
+) => {
+	if (browser) {
+		await initializeFirebase().catch(console.error);
+	}
+
+	if (!db) {
+		console.warn('Firestore is not initialized');
+		return undefined;
+	}
+
+	try {
+		const userLibraryRef = collection(db, 'users', userId, 'library');
+		const bookDocRef = doc(userLibraryRef, bookId);
+
+		await updateDoc(bookDocRef, {
+			readingStatus: readingStatus
+		});
+
+		return { status: 'success', message: 'Reading status successfully' };
+	} catch (error) {
+		return { status: 'error', message: 'Error updating reading status' };
+	}
+};
+
+export const updateLibraryBookBookshelves = async ( userId: string, bookId: string, bookshelves: string[]) => {
+	if (browser) {
+		await initializeFirebase().catch(console.error);
+	}
+
+	if (!db) {
+		console.warn('Firestore is not initialized');
+		return undefined;
+	}
+
+	try {
+		const userLibraryRef = collection(db, 'users', userId, 'library');
+		const bookDocRef = doc(userLibraryRef, bookId);
+
+		await updateDoc(bookDocRef, {
+			bookshelves: bookshelves
+		});
+
+		return { status: 'success', message: 'Bookshelves updated successfully' };
+	} catch (error) {
+		return { status: 'error', message: 'Error updating bookshelves' };
+	}
 }
+
 
 /**
  * Updates a book and a user with new bookshelves information.
@@ -103,14 +154,13 @@ export const addUniqueBookshelvesAndUpdateUser = async (
 	bookId: string,
 	newBookshelves: string[]
 ) => {
-
 	if (newBookshelves[0] === '') {
 		return;
 	}
 
-    if (browser) {
-        await initializeFirebase().catch(console.error);
-    }
+	if (browser) {
+		await initializeFirebase().catch(console.error);
+	}
 
 	if (!db) {
 		console.warn('Firestore is not initialized');

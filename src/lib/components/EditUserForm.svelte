@@ -106,6 +106,7 @@
 
 	h3 {
 		font-size: 1rem;
+		text-transform: uppercase;
 	}
 
 	.button-group {
@@ -139,7 +140,6 @@
 	.input-group label {
 		align-items: center;
 		justify-content: center;
-		border-radius: 5px;
 		font-family: var(--header-font);
 		font-size: 0.8rem;
 		display: flex;
@@ -158,7 +158,6 @@
 	.input-group select {
 		border: 2px solid var(--primary-colour-purple);
 		background-color: var(--accent-light-blue-grey);
-		border-radius: 5px;
 		padding: 0.5rem;
 		margin-bottom: 0.5rem;
 		width: 100%;

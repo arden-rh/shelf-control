@@ -528,7 +528,17 @@
 		justify-content: center;
 		width: 100%;
 		padding: 0;
-		margin: 0 0 2rem 0.5rem;
+		margin: 0 0 3rem 0.5rem;
+	}
+
+	.currently-reading-container {
+		display: flex;
+		flex-direction: row;
+		align-items: flex-start;
+		justify-content: flex-start;
+		width: 100%;
+		flex-wrap: wrap;
+		gap: 1rem;
 	}
 
 	.library-link-container {
