@@ -177,4 +177,10 @@
 		width: 100%;
 		max-width: 100%;
 	}
+
+	@media (min-width: 768px) {
+		.button {
+			min-height: fit-content;
+		}
+	}
 </style>
