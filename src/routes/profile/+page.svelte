@@ -223,7 +223,6 @@
 						{#each currentlyReadingBooks as book}
 							<button class="reading-book" on:click={() => openBook(book)} use:melt={$trigger}>
 								<img src={book.imageLinks?.smallThumbnail} alt={`Book over of ${book.title}`} />
-								<div class="cover-overlay"></div>
 							</button>
 						{/each}
 					{:else}
@@ -412,13 +411,12 @@
 		font-weight: 500;
 		max-width: calc(50% - 0.5rem);
 		margin-top: 0.75rem;
+		cursor: pointer;
 	}
 
 	.all-bookshelves-container a:hover {
 		border-color: var(--accent-blue-grey);
 		box-shadow: inset -8px -8px 0px 0px var(--accent-dark-blue-grey);
-		/* color: var(--primary-white); */
-		/* background-color: var(--secondary-colour-purple); */
 	}
 
 	.all-bookshelves-container a:hover::before,
@@ -479,7 +477,7 @@
 		justify-content: flex-end;
 		width: 100%;
 		border: 12px solid var(--secondary-colour-purple);
-		box-shadow: inset -8px -8px 0px 0px rgba(178, 152, 220, 1);
+		box-shadow: inset -8px -8px 0px 0px var(--accent-pink-purple);
 		position: relative;
 		padding: 0.8rem 0 0;
 		padding: 0.8rem 1.25rem 1.25rem;
@@ -546,6 +544,7 @@
 		height: fit-content;
 		padding: 0.4rem 0.8rem;
 		margin-right: 0.5rem;
+		box-shadow: none;
 	}
 
 	.profile-container {
@@ -634,10 +633,8 @@
 		font-size: 0.7rem;
 		height: fit-content;
 		padding: 0.4rem 0.8rem;
-		background-color: var(--accent-blue-grey);
-		border: 4px solid var(--accent-dark-blue-grey);
+		border: none;
 		color: var(--primary-black);
-		margin-right: 0.5rem;
 		box-shadow: 2px 2px 2px 0px rgba(0, 0, 0, 0.5);
 	}
 
@@ -673,14 +670,13 @@
 		object-position: center;
 	}
 
-	.cover-overlay {
+	.reading-book::after {
+		content: '';
 		position: absolute;
 		top: 0;
 		left: 0;
 		right: 0;
 		bottom: 0;
-		width: 100%;
-		height: 100%;
 		background-image: linear-gradient(
 			to bottom,
 			rgba(52, 34, 138, 0.5),
@@ -690,7 +686,7 @@
 		transition: opacity 0.3 ease;
 	}
 
-	.cover-overlay:hover {
+	.reading-book:hover::after {
 		opacity: 0;
 	}
 

@@ -178,6 +178,7 @@
 		justify-content: center;
 		max-width: 1000px;
 	}
+
 	.staticSite {
 		flex-direction: column;
 		align-items: flex-start;

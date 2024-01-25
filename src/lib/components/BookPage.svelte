@@ -160,64 +160,74 @@
 
 <section>
 	<h2>{book.title}</h2>
-	<div class="book-info-container">
+	<div class="book-page-container">
 		<div class="book-actions">
-			<a href="/profile/library" class="button button-secondary">Library</a>
-			<button on:click={editBook} use:melt={$trigger} class="button button-secondary"
+			<a href="/profile/library" class="button button-primary">Library</a>
+			<button on:click={editBook} use:melt={$trigger} class="button button-primary"
 				>Edit Book</button
 			>
-			<button on:click={editBookShelves} use:melt={$trigger} class="button button-secondary"
+			<button on:click={editBookShelves} use:melt={$trigger} class="button button-primary"
 				>Edit Bookshelves</button
 			>
-			<button on:click={deleteBook} class="button button-secondary">Delete Book</button>
+			<button on:click={deleteBook} class="button button-primary">Delete Book</button>
 		</div>
-		<div class="book-info">
-			<div class="book-image">
-				{#if book.imageLinks?.thumbnail}
-					<img
-						src={book.imageLinks.thumbnail}
-						alt={book.title}
-						class="object-cover object-center"
-					/>
-				{:else}
-					<div class="placeholder-thumbnail">Cover Missing</div>
-				{/if}
+		<div class="book-info-container">
+			<div class="book-info">
+				<div class="book-image">
+					{#if book.imageLinks?.thumbnail}
+						<img
+							src={book.imageLinks.thumbnail}
+							alt={book.title}
+							class="object-cover object-center"
+						/>
+					{:else}
+						<div class="placeholder-thumbnail">Cover Missing</div>
+					{/if}
+				</div>
+				<div class="book-details">
+					<ul>
+						<li>
+							<span>{book.authors && book.authors.length > 1 ? 'Authors: ' : 'Author: '}</span>
+							{book.authors ? book.authors.join(', ') : 'N/A'}
+						</li>
+						<li>
+							<span>Published:</span>
+							{book.publishedDate ? book.publishedDate : 'Unknown'}
+						</li>
+						<li>
+							<span>Publisher:</span>
+							{book.publisher ? book.publisher : 'Unknown'}
+						</li>
+						<li>
+							<span>Print type:</span>
+							{book.printType ? book.printType : 'Unknown'}
+						<li>
+							<span>Page count:</span>
+							{book.pageCount ? book.pageCount : 'Unknown'}
+						</li>
+						<li>
+							<span>ISBN:</span>
+							{book.isbn ? book.isbn : 'Unknown'}
+						</li>
+						<li>
+							<span>Language:</span>
+							{book.language ? book.language.toUpperCase() : 'Unknown'}
+						</li>
+						<li>
+							<span>Categories:</span>
+							{book.categories ? book.categories.join(', ') : 'No assigned categories'}
+						</li>
+						<li>
+							<span>Bookshelves:</span>
+							{book.bookshelves && book.bookshelves.length > 0 ? book.bookshelves.join(', ') : 'Not added'}
+						</li>
+					</ul>
+				</div>
+				<div class="reading-status">Reading status: {book.readingStatus}</div>
 			</div>
-			<div class="book-details">
-				<ul>
-					<li>
-						<span>{book.authors && book.authors.length > 1 ? 'Authors: ' : 'Author: '}</span>
-						{book.authors ? book.authors.join(', ') : 'N/A'}
-					</li>
-					<li>
-						<span>Published:</span>
-						{book.publishedDate ? book.publishedDate : 'Unknown'}
-					</li>
-					<li>
-						<span>Page count:</span>
-						{book.pageCount ? book.pageCount : 'Unknown'}
-					</li>
-					<li>
-						<span>Categories:</span>
-						{book.categories ? book.categories.join(', ') : 'Unknown'}
-					</li>
-					<li>
-						<span>ISBN:</span>
-						{book.isbn ? book.isbn : 'Unknown'}
-					</li>
-					<li>
-						<span>Language:</span>
-						{book.language ? book.language : 'Unknown'}
-					</li>
-					<li>
-						<span>Bookshelf:</span>
-						{book.bookshelves ? book.bookshelves.join(', ') : 'Not added'}
-					</li>
-				</ul>
+			<div class="book-description">
+				<p>{book.description}</p>
 			</div>
-		</div>
-		<div class="book-description">
-			<p>{book.description}</p>
 		</div>
 	</div>
 	<div use:melt={$portalled}>
@@ -264,32 +274,62 @@
 
 	h2 {
 		margin-bottom: 1rem;
+		text-transform: uppercase;
+		font-size: 1.5rem;
+		align-self: flex-start;
 	}
 	.book-image {
-		width: 100%;
-		margin-bottom: 2rem;
+		width: fit-content;
+		border: 4px solid var(--primary-colour-purple);
 	}
 	.book-image img {
 		width: 100%;
-		height: 100%;
+		object-position: center;
+		object-fit: contain;
+		max-height: 250px;
+	}
+
+	.book-info {
+		display: flex;
+		flex-direction: row;
+		align-items: flex-start;
+		justify-content: flex-start;
+		gap: 1rem;
+		width: 100%;
+		flex-wrap: wrap;
 	}
 
 	.book-info-container {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		justify-content: flex-start;
+		gap: 1rem;
+		width: 100%;
+		margin-bottom: 1rem;
+	}
+
+	.book-page-container {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
 		gap: 1rem;
 		width: 100%;
+		margin-bottom: 5rem;
 	}
 
-	.book-info-container ul li {
+	.book-page-container ul li {
 		font-size: 0.85rem;
 		line-height: 1rem;
 		margin-bottom: 0.25rem;
 	}
 
-	.book-info-container ul li span {
+	.book-page-container ul li:nth-last-child(1) {
+		margin-bottom: 0rem;
+	}
+
+	.book-page-container ul li span {
 		font-weight: 700;
 		letter-spacing: 0.03rem;
 	}
@@ -298,38 +338,83 @@
 		display: flex;
 		flex-direction: row;
 		align-items: center;
-		justify-content: flex-end;
+		justify-content: center;
 		margin-bottom: 1rem;
-		align-self: flex-end;
-		background-color: var(--secondary-colour-purple);
-		border-radius: 5px;
-		overflow: hidden;
 	}
 	.book-actions .button {
 		font-size: 0.7rem;
 		height: fit-content;
 		padding: 0.5rem 1rem;
-		border-radius: 0;
-		background-color: var(--accent-purple);
 		border: none;
+	}
+
+	.book-description {
+		font-size: 0.9rem;
+		background-color: var(--primary-white);
+		padding: 1rem;
+		/* box-shadow: 2px 2px 2px 0px rgba(0, 0, 0, 0.6); */
+	}
+
+	.book-details span {
+		font-weight: 600;
+		letter-spacing: 0.03rem;
+		font-family: var(--header-font);
+		text-transform: uppercase;
 		color: var(--primary-colour-purple);
 	}
-
-	.book-actions .button:nth-child(2) {
-		border-left: 1px solid var(--accent-light-blue-grey);
-		border-right: 1px solid var(--accent-light-blue-grey);
+	.book-details ul {
+		list-style: none;
+		padding: 0;
+		margin-top: 0.25rem;
 	}
-
-	.book-actions .button:nth-child(3) {
-		border-right: 1px solid var(--accent-light-blue-grey);
-	}
-
-	.book-actions .button:hover {
-		background-color: var(--primary-colour-purple);
-		color: var(--primary-white);
-	}
-
 	.dialog {
 		overflow-y: scroll;
+	}
+
+	.reading-status {
+		font-size: 0.9rem;
+		font-weight: 400;
+		letter-spacing: 0.03rem;
+		font-family: var(--header-font);
+		text-transform: uppercase;
+		background-color: var(--primary-grey);
+		width: 100%;
+		padding: 0.5rem;
+		box-shadow: 2px 2px 2px 0px rgba(0, 0, 0, 0.6);
+	}
+
+	@media (min-width: 768px) {
+
+		.book-actions {
+			align-self: flex-end;
+		}
+		.book-description {
+			max-width: 60%;
+		}
+
+		.book-details ul {
+			margin-top: 0;
+		}
+
+		.book-image {
+			width: 100%;
+		}
+
+		.book-image img {
+			max-height: none;
+			min-height: 300px;
+		}
+
+		.book-info {
+			/* align-items: flex-end; */
+			flex-direction: column;
+			max-width: fit-content;
+		}
+
+		.book-info-container {
+			flex-direction: row;
+			align-items: flex-start;
+			justify-content: flex-end;
+		}
 	}
 </style>

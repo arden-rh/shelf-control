@@ -141,6 +141,8 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		box-shadow: 5px 0px 5px 0px rgba(0, 0, 0, 0.6);
+		z-index: 1;
 	}
 
 	footer {
@@ -150,6 +152,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		height: 5rem;
 	}
 
 	.footer-container {
@@ -157,7 +160,6 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		margin: 2rem 0;
 	}
 	.footer-content {
 		display: flex;
@@ -231,6 +233,7 @@
 		align-items: center;
 		width: 100%;
 		background-color: var(--accent-light-blue-grey);
+		min-height: calc(100vh - 10rem);
 	}
 
 	@media (min-width: 768px) {
