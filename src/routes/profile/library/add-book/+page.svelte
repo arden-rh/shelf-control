@@ -2,13 +2,12 @@
 	import { createLibraryBook } from '$lib/hooks/createLibraryBook.client';
 	import { createDialog, melt } from '@melt-ui/svelte';
 	import { faRectangleXmark } from '@fortawesome/free-solid-svg-icons';
-	import { fetchGoogleBooks } from '$lib/queries/books';
 	import { get, writable } from 'svelte/store';
 	import { goto } from '$app/navigation';
 	import { session } from '$lib/stores/session';
 	import { toLibraryBook } from '$lib/utility/toLibraryBook';
 	import { useQuery } from '@sveltestack/svelte-query';
-	import Fa from 'svelte-fa'
+	import Fa from 'svelte-fa';
 	import type { LibraryBook, VolumeInfo } from '$lib/types/books.types';
 	import type { PageData } from './$types';
 	import type { SessionState } from '$lib/types/session.types';
@@ -54,7 +53,7 @@
 		if (response?.success) {
 			console.log('Book added successfully:');
 
-			goto(`/profile/library?bookId=${response.bookId}`);		
+			goto(`/profile/library?bookId=${response.bookId}`);
 		} else {
 			console.error('Failed to add book:', response?.error);
 		}
@@ -198,7 +197,6 @@
 </section>
 
 <style>
-
 	h1 {
 		padding: 0 0.8rem 0 1.25rem;
 	}
@@ -206,8 +204,8 @@
 	h2 {
 		font-size: 1.2rem;
 		letter-spacing: 0.025rem;
+		text-transform: uppercase;
 	}
-
 
 	h3 {
 		font-size: 1rem;
@@ -215,6 +213,7 @@
 		margin-bottom: 0.25rem;
 		color: var(--primary-black);
 		font-weight: 400;
+		text-transform: uppercase;
 	}
 
 	h4 {
@@ -245,7 +244,6 @@
 
 	.add-book-form label input {
 		border: 2px solid var(--primary-colour-purple);
-		border-radius: 5px;
 		padding: 0.5rem;
 		width: 100%;
 	}
@@ -290,6 +288,10 @@
 	}
 
 	@media (min-width: 768px) {
+		h3 span,
+		h4 span {
+			display: inline;
+		}
 		.add-book-form label input {
 			max-width: 400px;
 		}

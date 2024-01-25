@@ -3,9 +3,7 @@
 	import { createDialog, melt } from '@melt-ui/svelte';
 	import { deleteLibraryBook } from '$lib/hooks/deleteLibraryBook.client';
 	import { editLibraryBook } from '$lib/hooks/editLibraryBook.client';
-	import { faRectangleXmark } from '@fortawesome/free-solid-svg-icons';
-	import { fetchGoogleBooks } from '$lib/queries/books';
-	import { get, writable } from 'svelte/store';
+	import { writable } from 'svelte/store';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
@@ -20,10 +18,8 @@
 	import { X } from 'lucide-svelte';
 	import EditBookForm from './EditBookForm.svelte';
 	import EditBookshelvesForm from './EditBookshelvesForm.svelte';
-	import Fa from 'svelte-fa';
 	import type { LibraryBookWithId } from '$lib/types/books.types';
 	import type { LoggedInUser } from '$lib/types/user.types';
-	import type { SessionState } from '$lib/types/session.types';
 
 	export let book: LibraryBookWithId;
 	export let user: LoggedInUser | null = null;
@@ -48,7 +44,6 @@
 	}
 
 	$: book = $bookStore;
-
 
 	function editBook() {
 		editingLibraryBook = true;
@@ -91,7 +86,7 @@
 				bookStore.set({
 					...book,
 					...formData
-				} as LibraryBookWithId)
+				} as LibraryBookWithId);
 
 				editingLibraryBook = false;
 				$open = false;
@@ -176,7 +171,11 @@
 	async function updateBookReadingStatus() {
 		if (user && user.uid && book._id) {
 			try {
-				const response = await updateLibraryBookReadingStatus(user.uid, book._id, book.readingStatus);
+				const response = await updateLibraryBookReadingStatus(
+					user.uid,
+					book._id,
+					book.readingStatus
+				);
 				if (response?.status === 'success') {
 					updatingReadingStatus = false;
 					$open = false;
@@ -215,7 +214,9 @@
 			<button on:click={editBookshelves} use:melt={$trigger} class="button button-primary"
 				>Edit Bookshelves</button
 			>
-			<button on:click={handleDelete} use:melt={$trigger} class="button button-primary">Delete Book</button>
+			<button on:click={handleDelete} use:melt={$trigger} class="button button-primary"
+				>Delete Book</button
+			>
 		</div>
 		<div class="book-info-container">
 			<div class="book-info">
@@ -247,6 +248,7 @@
 						<li>
 							<span>Print type:</span>
 							{book.printType ? book.printType : 'Unknown'}
+						</li>
 						<li>
 							<span>Page count:</span>
 							{book.pageCount ? book.pageCount : 'Unknown'}
@@ -265,11 +267,15 @@
 						</li>
 						<li>
 							<span>Bookshelves:</span>
-							{book.bookshelves && book.bookshelves.length > 0 ? book.bookshelves.join(', ') : 'Not added'}
+							{book.bookshelves && book.bookshelves.length > 0
+								? book.bookshelves.join(', ')
+								: 'Not added'}
 						</li>
 					</ul>
 				</div>
-				<button on:click={updateReadingStatus} use:melt={$trigger} class="button reading-status">Reading status: {book.readingStatus}</button>
+				<button on:click={updateReadingStatus} use:melt={$trigger} class="button reading-status"
+					>Reading status: {book.readingStatus}</button
+				>
 			</div>
 			<div class="book-description">
 				<p>{book.description}</p>
@@ -286,7 +292,7 @@
 				use:melt={$content}
 			>
 				{#if editingBookshelves}
-					<EditBookshelvesForm 
+					<EditBookshelvesForm
 						bookshelves={book.bookshelves}
 						on:cancel={handleCancel}
 						on:save={handleUpdateBook}
@@ -302,7 +308,9 @@
 							</select>
 							<div class="button-group">
 								<button class="button button-primary" type="submit">Save Changes</button>
-								<button class="button button-secondary" type="button" on:click={handleCancel}>Cancel</button>
+								<button class="button button-secondary" type="button" on:click={handleCancel}
+									>Cancel</button
+								>
 							</div>
 						</form>
 					</div>
@@ -325,12 +333,14 @@
 						on:submit={handleUpdateBook}
 						on:delete={handleDelete}
 					/>
-					{:else if deletingBook}
+				{:else if deletingBook}
 					<form on:submit|preventDefault={deleteBook}>
 						<h3>Are you sure you want to delete this book?</h3>
 						<div class="button-group">
 							<button class="button button-primary" type="submit">Yes</button>
-							<button class="button button-secondary" type="button" on:click={handleCancel}>No</button>
+							<button class="button button-secondary" type="button" on:click={handleCancel}
+								>No</button
+							>
 						</div>
 					</form>
 				{/if}
@@ -350,13 +360,17 @@
 		text-transform: uppercase;
 		font-size: 1.5rem;
 		align-self: flex-start;
+		border-bottom: 8px solid var(--secondary-colour-purple);
+		box-shadow: inset 0px -4px 0px 0px var(--accent-pink-purple);
+		padding-bottom: 0.5rem;
+		width: 100%;
+		line-height: 1.75rem;
 	}
 
 	h3 {
 		font-size: 1rem;
 		text-transform: uppercase;
 	}
-
 
 	.button-group {
 		display: flex;
@@ -424,15 +438,16 @@
 	.book-actions {
 		display: flex;
 		flex-direction: row;
-		align-items: center;
 		justify-content: center;
 		margin-bottom: 1rem;
+		align-items: stretch;
 	}
 	.book-actions .button {
 		font-size: 0.7rem;
-		height: fit-content;
-		padding: 0.5rem 1rem;
+		padding: 0.75rem 1rem;
 		border: none;
+		line-height: 1rem;
+		min-height: 2.5rem;
 	}
 
 	.book-description {
@@ -506,8 +521,11 @@
 		font-size: 0.9rem;
 	}
 
-
 	@media (min-width: 768px) {
+		h2 {
+			font-size: 2rem;
+			line-height: 2.25rem;
+		}
 
 		.book-actions {
 			align-self: flex-end;

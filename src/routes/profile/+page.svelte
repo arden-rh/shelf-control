@@ -17,7 +17,6 @@
 	import type { AppUser, LoggedInUser } from '$lib/types/user.types';
 	import type { SessionState } from '$lib/types/session.types';
 
-	let newBookshelves = ['Fantasy', 'Bestsellers'];
 	const selectedBook = writable({} as LibraryBookWithId);
 	let books: LibraryBookWithId[] = [];
 	let bookshelves: string[] = [];
@@ -59,10 +58,11 @@
 		displayName = appUser.displayName?.replace(/\./g, ' ').split('-')[0];
 		userId = appUser.uid;
 		console.log('appUser', appUser);
-		getFavouriteShelf();
 		getAllBookshelves();
 		getAllCurrentlyReadingBooks();
+		getFavouriteShelf();
 	}
+
 
 	function openBook(book: LibraryBookWithId) {
 		selectedBook.set(book);
@@ -183,6 +183,7 @@
 					<button on:click={editUser} use:melt={$trigger} class="button button-primary"
 						>Edit profile</button
 					>
+					<button class="button button-primary">Edit bookshelves</button>
 				</div>
 			{/if}
 			<section class="profile-info">
@@ -479,8 +480,7 @@
 		border: 12px solid var(--secondary-colour-purple);
 		box-shadow: inset -8px -8px 0px 0px var(--accent-pink-purple);
 		position: relative;
-		padding: 0.8rem 0 0;
-		padding: 0.8rem 1.25rem 1.25rem;
+ 		padding: 0.8rem 1.25rem 1.25rem;
 	}
 
 	.bookshelves-container::before,
