@@ -193,7 +193,7 @@
 	{#if bookId && book && !loading}
 		<BookPage {book} {user} />
 	{:else if bookshelf && !loading}
-		<BookshelfPage {bookshelf} {user} />
+		<BookshelfPage {bookshelf} {user} {bookshelvesStore} />
 	{:else if noQuery && !loading}
 		<div class="library-container">
 			{#if books.length === 0}
@@ -340,11 +340,12 @@
 		display: flex;
 		flex-direction: row;
 		align-items: flex-start;
-		justify-content: space-between;
 		width: 100%;
 		padding: 0;
 		margin-bottom: 2rem;
 		flex-wrap: wrap;
+		justify-content: flex-start;
+		gap: 1.25rem;
 	}
 
 	.all-bookshelves-container a {
@@ -355,7 +356,7 @@
 		padding: 0 0.75rem;
 		text-transform: uppercase;
 		font-weight: 500;
-		max-width: calc(50% - 0.5rem);
+		max-width: calc(50% - 0.75rem);
 		margin-top: 0.75rem;
 		cursor: pointer;
 	}
@@ -531,6 +532,11 @@
 			font-size: 1rem;
 		}
 
+		.all-bookshelves-container a {
+			max-width: calc(33% - 0.75rem);
+			font-size: 1rem;
+		}
+
 		.bookshelves-container {
 			border: 12px solid var(--secondary-colour-purple);
 			box-shadow: inset -8px -8px 0px 0px var(--accent-pink-purple);
@@ -547,6 +553,10 @@
 		h2 {
 			font-size: 2.5rem;
 			padding-bottom: 0.75rem;
+		}
+
+		.all-bookshelves-container a {
+			max-width: calc(25% - 1rem);
 		}
 
 		.bookshelves-container {

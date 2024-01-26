@@ -256,17 +256,27 @@
 							<span>Categories:</span>
 							{book.categories.join(', ')}
 						</li>
-						<li>
-							<span>Bookshelves:</span>
-							{book.bookshelves && book.bookshelves.length > 0
-								? book.bookshelves.join(', ')
-								: 'Not added'}
-						</li>
 					</ul>
+					<div>
+						<div class="bookshelves-info">
+							<h3>Bookshelves:</h3>
+							<ul>
+								{#if book.bookshelves && book.bookshelves.length > 0}
+									{#each book.bookshelves as bookshelf}
+										<li class="bookshelf-link">
+											<a href={`/profile/library?bookshelf=${bookshelf}`}>{bookshelf}</a>
+										</li>
+									{/each}
+								{:else}
+									Not added
+								{/if}
+							</ul>
+						</div>
+						<button on:click={updateReadingStatus} use:melt={$trigger} class="button reading-status"
+							>Reading status: {book.readingStatus}</button
+						>
+					</div>
 				</div>
-				<button on:click={updateReadingStatus} use:melt={$trigger} class="button reading-status"
-					>Reading status: {book.readingStatus}</button
-				>
 			</div>
 			<div class="book-description">
 				<p>{book.description}</p>
@@ -360,14 +370,18 @@
 	}
 
 	.book-image {
-		width: fit-content;
-		border: 4px solid var(--primary-colour-purple);
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 	.book-image img {
-		width: 100%;
+		width: auto;
 		object-position: center;
 		object-fit: contain;
 		max-height: 250px;
+		height: 250px;
+		border: 4px solid var(--primary-colour-purple);
 	}
 
 	.book-info {
@@ -406,10 +420,6 @@
 		margin-bottom: 0.25rem;
 	}
 
-	.book-page-container ul li:nth-last-child(1) {
-		margin-bottom: 0rem;
-	}
-
 	.book-page-container ul li span {
 		font-weight: 700;
 		letter-spacing: 0.03rem;
@@ -433,6 +443,10 @@
 		padding: 1rem;
 	}
 
+	.book-details {
+		margin-bottom: 1rem;
+	}
+
 	.book-details span {
 		font-weight: 600;
 		letter-spacing: 0.03rem;
@@ -445,21 +459,57 @@
 		padding: 0;
 		margin-top: 0.25rem;
 	}
+
+	.bookshelf-link {
+		font-size: 0.75rem;
+		background-color: var(--primary-grey);
+		padding: 0.5rem;
+		box-shadow: 2px 2px 2px 0px rgba(0, 0, 0, 0.6);
+	}
+
+	.bookshelves-info {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		justify-content: flex-start;
+		width: 100%;
+		margin-top: 0.75rem;
+	}
+
+	.bookshelf-link:hover {
+		background-color: var(--secondary-grey);
+	}
+
+	.bookshelves-info h3 {
+		display: block;
+		font-size: 1.25rem;
+		font-weight: 500;
+		color: var(--primary-black);
+	}
+
+	.bookshelves-info ul {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		padding: 0;
+		margin-bottom: 0.5rem;
+	}
+
 	.dialog {
 		overflow-y: scroll;
 	}
 
 	.reading-status {
 		font-size: 0.9rem;
-		background-color: var(--primary-grey);
+		background-color: var(--accent-blue-grey);
 		width: 100%;
 		padding: 0.5rem;
 		box-shadow: 2px 2px 2px 0px rgba(0, 0, 0, 0.6);
 	}
 
 	.reading-status:hover {
-		background-color: var(--primary-colour-purple);
-		color: var(--primary-white);
+		background-color: var(--accent-dark-blue-grey);
 	}
 
 	.update-reading-status-form {
@@ -504,6 +554,12 @@
 		}
 	}
 
+	@media (min-width: 550px) {
+		.book-image {
+			width: fit-content;
+		}
+	}
+
 	@media (min-width: 768px) {
 		h2 {
 			font-size: 2rem;
@@ -518,8 +574,13 @@
 			margin-top: 0;
 		}
 
+		.bookshelves-info ul {
+			max-width: 200px;
+		}
+
 		.book-image {
 			width: 100%;
+			justify-content: flex-start;
 		}
 
 		.book-image img {
@@ -541,6 +602,9 @@
 			width: 100%;
 			height: 300px;
 			font-size: 1.25rem;
+		}
+		.reading-status {
+			max-width: 200px;
 		}
 	}
 </style>

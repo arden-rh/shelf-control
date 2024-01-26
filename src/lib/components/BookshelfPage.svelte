@@ -1,21 +1,49 @@
 <script lang="ts">
+	import { addToast } from './Toaster.svelte';
+	import { allBookStore } from '$lib/stores/books.stores';
 	import { createDialog, melt } from '@melt-ui/svelte';
-	import { getBooksByBookshelf } from '$lib/firebase/bookFirestore';
+	import { getBooksByBookshelf, updateLibraryBookBookshelves } from '$lib/firebase/bookFirestore';
+	import { goto } from '$app/navigation';
+	import { onDestroy } from 'svelte';
+	import { updateUserLibraryBookshelves } from '$lib/firebase/libraryFirestore';
+	import { userStore } from '$lib/stores/user.stores';
 	import { writable } from 'svelte/store';
+	import type { AppUser, LoggedInUser } from '$lib/types/user.types';
 	import type { LibraryBookWithId } from '$lib/types/books.types';
-	import type { LoggedInUser } from '$lib/types/user.types';
+	import type { Writable } from 'svelte/store';
 
+	const currentBookshelfBooks = writable<LibraryBookWithId[]>([]);
 	export let bookshelf: string;
 	export let user: LoggedInUser | null = null;
-	const currentBookshelfBooks = writable<LibraryBookWithId[]>([]);
+	export let bookshelvesStore: Writable<string[]>;
+	let addingBookToBookshelf = false;
+	let allBooks: LibraryBookWithId[] = [];
+	let appUser: AppUser | undefined;
 	let bookshelfBooks: LibraryBookWithId[] = [];
 	let deletingBookshelf = false;
-	let editingBookshelf = false;
-	let addingBookToBookshelf = false;
+	let newBookId: string = '';
 
 	$: if (bookshelf) {
 		getBookshelfBooks();
 	}
+
+	$: if (!$open) {
+		deletingBookshelf = false;
+		addingBookToBookshelf = false;
+	}
+
+	const unsubscribeBookStore = allBookStore.subscribe((current: LibraryBookWithId[]) => {
+		allBooks = current;
+	});
+
+	const unsubscribeUserStore = userStore.subscribe((current: AppUser) => {
+		appUser = current;
+	});
+
+	onDestroy(() => {
+		unsubscribeBookStore();
+		unsubscribeUserStore();
+	});
 
 	const {
 		elements: { trigger, portalled, overlay, content, title, description, close },
@@ -34,16 +62,110 @@
 		$open = false;
 	}
 
-	function handleEditBookshelves() {
-		editingBookshelf = true;
+	async function addBookToBookshelf() {
+		if (!user || !user.uid || !newBookId) {
+			return;
+		}
+
+		try {
+			const selectedBook = allBooks.find((book) => book._id === newBookId);
+
+			if (selectedBook) {
+				const updatedBookshelves = [...(selectedBook.bookshelves || []), bookshelf];
+
+				const response = await updateLibraryBookBookshelves(
+					user.uid,
+					selectedBook._id,
+					updatedBookshelves
+				);
+
+				if (response?.status === 'success') {
+					getBookshelfBooks();
+
+					addToast({
+						data: {
+							title: 'Success',
+							description: 'Book added to bookshelf successfully',
+							status: 'success'
+						}
+					});
+				}
+			}
+		} catch (error) {
+			console.error(error);
+			addToast({
+				data: {
+					title: 'Error',
+					description: 'Failed to add book to bookshelf',
+					status: 'error'
+				}
+			});
+		} finally {
+			addingBookToBookshelf = false;
+			$open = false;
+		}
 	}
 
-	function editBookshelves() {
-		console.log('edit bookshelves');
-	}
+	async function deleteBookshelf() {
+		if (!user || !user.uid) {
+			return;
+		}
 
-	function addBookToBookshelf() {
-		console.log('add book to bookshelf');
+		try {
+			if (bookshelfBooks.length > 0) {
+				for (const book of bookshelfBooks) {
+					const updatedBookshelves = book.bookshelves!.filter((shelf) => shelf !== bookshelf);
+					const bookUpdateResponse = await updateLibraryBookBookshelves(
+						user.uid,
+						book._id,
+						updatedBookshelves
+					);
+					if (bookUpdateResponse?.status !== 'success') {
+						throw new Error(
+							bookUpdateResponse?.message || `Failed to update bookshelves for book ${book.title}`
+						);
+					}
+				}
+			}
+
+			const currentBookshelves = appUser?.allBookshelves || [];
+			const updatedBookshelves = currentBookshelves.filter((shelf) => shelf !== bookshelf);
+			const response = await updateUserLibraryBookshelves(user.uid, updatedBookshelves);
+
+			if (response?.status !== 'success') {
+				addToast({
+					data: {
+						title: 'Error',
+						description: 'Failed to delete bookshelf',
+						status: 'error'
+					}
+				});
+			}
+
+			getBookshelfBooks();
+			bookshelvesStore.update((currentBookshelves) => {
+				return currentBookshelves.filter((shelf) => shelf !== bookshelf);
+			});
+			goto('/profile/library');
+
+			addToast({
+				data: {
+					title: 'Success',
+					description: 'Bookshelf deleted successfully',
+					status: 'success'
+				}
+			});
+		} catch (error) {
+			addToast({
+				data: {
+					title: 'Error',
+					description: 'Failed to delete bookshelf',
+					status: 'error'
+				}
+			});
+		} finally {
+			$open = false;
+		}
 	}
 
 	async function getBookshelfBooks() {
@@ -67,39 +189,31 @@
 <section>
 	<h2>Bookshelf: {bookshelf}</h2>
 	<div class="bookshelf-container">
+		<div class="bookshelf-actions">
+			<a href="/profile/library" class="button button-action">Library</a>
+			<button on:click={handleAddBookToBookshelf} use:melt={$trigger} class="button button-action"
+				>Add book to bookshelf</button
+			>
+			<button on:click={handleDeleteBookshelf} use:melt={$trigger} class="button button-action"
+				>Delete bookshelf</button
+			>
+		</div>
 		{#if bookshelfBooks.length > 0}
-			<div class="bookshelf-actions">
-				<a href="/profile/library" class="button button-action">Library</a>
-				<button on:click={handleAddBookToBookshelf} use:melt={$trigger} class="button button-action"
-					>Add book</button
-				>
-				<button on:click={handleEditBookshelves} use:melt={$trigger} class="button button-action"
-					>Edit bookshelf</button
-				>
-				<button on:click={handleDeleteBookshelf} use:melt={$trigger} class="button button-action"
-					>Delete bookshelf</button
-				>
-			</div>
 			<div class="grid-container bookshelves-container">
 				{#each bookshelfBooks as book}
 					<div class={bookshelfBooks.length > 1 ? 'grid-item' : 'grid-item single'}>
 						<a href={`/profile/library?bookId=${book._id}`}>
-							<img src={book.imageLinks?.thumbnail} alt={book.title} />
+							{#if book.imageLinks?.thumbnail}
+								<img src={book.imageLinks.thumbnail} alt={book.title} class="img" />
+							{:else}
+								<div class="placeholder-thumbnail img">Cover Missing</div>
+							{/if}
 							<h3>{book.title}</h3>
 						</a>
 					</div>
 				{/each}
 			</div>
 		{:else}
-			<div class="bookshelf-actions">
-				<a href="/profile/library" class="button button-action">Library</a>
-				<button on:click={handleAddBookToBookshelf} use:melt={$trigger} class="button button-action"
-					>Add book to bookshelf</button
-				>
-				<button on:click={handleEditBookshelves} use:melt={$trigger} class="button button-action"
-					>Edit bookshelf</button
-				>
-			</div>
 			<p>No books added to this bookshelf yet.</p>
 		{/if}
 	</div>
@@ -113,15 +227,27 @@
         rounded-md p-6 shadow-lg"
 				use:melt={$content}
 			>
-				{#if editingBookshelf}
-					hej
-				{:else if addingBookToBookshelf}
-					nej
+				{#if addingBookToBookshelf}
+					<div class="add-book-container">
+						<h3>Add one of your current books or add a new one</h3>
+						<form on:submit|preventDefault={addBookToBookshelf}>
+							<select id="reading-status" bind:value={newBookId}>
+								{#each allBooks as book}
+									<option value={book._id}>{book.title}</option>
+								{/each}
+							</select>
+							<div class="button-group">
+								<button class="button button-primary" type="submit">Add book</button>
+								<a href="/profile/library/add-book" class="button button-primary">Add new book</a>
+								<button class="button button-secondary" on:click={handleCancel}>Cancel</button>
+							</div>
+						</form>
+					</div>
 				{:else if deletingBookshelf}
 					<div class="delete-bookshelf-container">
 						<h3>Are you sure you want to delete your bookshelf?</h3>
 						<div class="button-group">
-							<button class="button button-primary" on:click={handleDeleteBookshelf}>Yes</button>
+							<button class="button button-primary" on:click={deleteBookshelf}>Yes</button>
 							<button class="button button-secondary" on:click={handleCancel}>No</button>
 						</div>
 					</div>
@@ -150,6 +276,37 @@
 	section {
 		padding: 0;
 		align-items: center;
+	}
+
+	.add-book-container {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		width: 100%;
+	}
+
+	.add-book-container h3 {
+		font-size: 1.25rem;
+		text-transform: uppercase;
+		margin-top: 1rem;
+	}
+
+	.add-book-container form {
+		display: flex;
+		flex-direction: column;
+		max-width: 400px;
+		margin: 2rem auto;
+		align-items: center;
+	}
+
+	.add-book-container select {
+		width: 100%;
+		border: 2px solid var(--primary-colour-purple);
+		background-color: var(--accent-light-blue-grey);
+		padding: 0.5rem;
+		margin-bottom: 0.5rem;
+		font-size: 0.8rem;
 	}
 
 	.bookshelf-container {
@@ -254,7 +411,7 @@
 		background-color: var(--secondary-grey);
 	}
 
-	.grid-item img {
+	.grid-item .img {
 		width: auto;
 		height: 120px;
 		object-fit: contain;
@@ -306,7 +463,7 @@
 			min-height: 300px;
 		}
 
-		.grid-item img {
+		.grid-item .img {
 			width: auto;
 			height: 200px;
 			object-fit: contain;
