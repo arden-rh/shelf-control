@@ -1,18 +1,18 @@
 <script lang="ts">
-	import { createLibraryBook } from '$lib/hooks/createLibraryBook.client';
+	import { addToast } from '$lib/components/Toaster.svelte';
 	import { createDialog, melt } from '@melt-ui/svelte';
+	import { createLibraryBook } from '$lib/hooks/createLibraryBook.client';
 	import { get, writable } from 'svelte/store';
 	import { goto } from '$app/navigation';
 	import { session } from '$lib/stores/session.stores';
 	import { toLibraryBook } from '$lib/utility/toLibraryBook';
 	import type { LibraryBook, VolumeInfo } from '$lib/types/books.types';
+	import type { LoggedInUser } from '$lib/types/user.types';
 	import type { PageData } from './$types';
 	import type { SessionState } from '$lib/types/session.types';
-	import type { LoggedInUser } from '$lib/types/user.types';
-	import { X } from 'lucide-svelte';
-	import { addToast } from '$lib/components/Toaster.svelte';
 
 	const q = writable('');
+	const author = writable('');
 	const selectedBook = writable({} as VolumeInfo);
 	let user: LoggedInUser | null = null;
 
@@ -74,10 +74,31 @@
 	<div class="add-book-form">
 		<h2>Search for a book</h2>
 		<form data-sveltekit-keepfocus action="/profile/library/add-book" method="get">
-			<label>
-				<input type="text" name="q" bind:value={$q} aria-label="Search for a book" />
-				<button type="submit" class="button button-primary submit-button">Search</button>
-			</label>
+			<div class="input-group">
+				<span>
+					<label for="q">Search query*</label>
+					<input
+						id="q"
+						name="q"
+						bind:value={$q}
+						type="text"
+						placeholder="Book title"
+						aria-describedby="asteriskExplanation"
+						required
+					/>
+				</span>
+				<span>
+					<label for="author">Author</label>
+					<input id="author" name="author" bind:value={$author} type="text" placeholder="Author" />
+				</span>
+			</div>
+
+			<small id="asteriskExplanation">* Required field</small>
+
+			<div class="button-group">
+				<button type="submit" class="button button-primary">Search</button>
+				<button type="reset" class="button button-secondary">Reset</button>
+			</div>
 		</form>
 	</div>
 	{#if data}
@@ -130,75 +151,75 @@
 	{:else}
 		<div class="">Loading...</div>
 	{/if}
-
-	<div use:melt={$portalled}>
-		{#if $open && $selectedBook}
-			<div class="fixed inset-0 z-50 bg-black/50" use:melt={$overlay} />
-			<div
-				class="dialog fixed left-[50%] top-[50%] z-50 max-h-[85vh]
+</section>
+<!-- Dialog -->
+<div use:melt={$portalled}>
+	{#if $open && $selectedBook}
+		<div class="fixed inset-0 z-50 bg-black/50" use:melt={$overlay} />
+		<div
+			class="dialog fixed left-[50%] top-[50%] z-50 max-h-[85vh]
             w-[90vw] max-w-[550px] translate-x-[-50%] translate-y-[-50%]
             rounded-md p-6 shadow-lg"
-				use:melt={$content}
-			>
-				<h3 use:melt={$title}>{$selectedBook.title}</h3>
-				<div class="dialog-cover-info">
-					{#if $selectedBook.imageLinks?.thumbnail}
-						<img src={$selectedBook.imageLinks.thumbnail} alt={$selectedBook.title} />
-					{:else}
-						<div class="placeholder-thumbnail">Cover Missing</div>
-					{/if}
-					<ul>
-						<li>
-							<span
-								>{$selectedBook.authors && $selectedBook.authors.length > 1
-									? 'Authors: '
-									: 'Author: '}</span
-							>
-							{$selectedBook.authors ? $selectedBook.authors.join(', ') : 'N/A'}
-						</li>
-						<li>
-							<span>Publisher:</span>
-							{$selectedBook.publisher ? $selectedBook.publisher : 'Unknown'}
-						</li>
-						<li>
-							<span>Published:</span>
-							{$selectedBook.publishedDate ? $selectedBook.publishedDate : 'Unknown'}
-						</li>
-						<li>
-							<span>Print Type:</span>
-							{$selectedBook.printType ? $selectedBook.printType : 'Unknown'}
-						</li>
-						<li>
-							<span>Page Count:</span>
-							{$selectedBook.pageCount ? $selectedBook.pageCount : 'Unknown'}
-						</li>
-						<li>
-							<span>Language:</span>
-							{$selectedBook.language ? $selectedBook.language.toUpperCase() : 'Unknown'}
-						</li>
-						<li>
-							<span>Industry Identifier:</span>
-							{$selectedBook.industryIdentifiers
-								? $selectedBook.industryIdentifiers[0].identifier
-								: 'Unknown'}
-						</li>
-						<li>
-							<span>Categories:</span>
-							{$selectedBook.categories ? $selectedBook.categories.join(', ') : 'Unknown'}
-						</li>
-					</ul>
-				</div>
-				{#if $selectedBook.description}
-					<p class="dialog-description" use:melt={$description}>{$selectedBook.description}</p>
+			use:melt={$content}
+		>
+			<h3 use:melt={$title}>{$selectedBook.title}</h3>
+			<div class="dialog-cover-info">
+				{#if $selectedBook.imageLinks?.thumbnail}
+					<img src={$selectedBook.imageLinks.thumbnail} alt={$selectedBook.title} />
+				{:else}
+					<div class="placeholder-thumbnail">Cover Missing</div>
 				{/if}
-				<div class="dialog-buttons">
-					<button class="button button-primary" on:click={() => addBook()}>Add book</button>
-					<button use:melt={$close} class="close-button button"> Close </button>
-				</div>
+				<ul>
+					<li>
+						<span
+							>{$selectedBook.authors && $selectedBook.authors.length > 1
+								? 'Authors: '
+								: 'Author: '}</span
+						>
+						{$selectedBook.authors ? $selectedBook.authors.join(', ') : 'N/A'}
+					</li>
+					<li>
+						<span>Publisher:</span>
+						{$selectedBook.publisher ? $selectedBook.publisher : 'Unknown'}
+					</li>
+					<li>
+						<span>Published:</span>
+						{$selectedBook.publishedDate ? $selectedBook.publishedDate : 'Unknown'}
+					</li>
+					<li>
+						<span>Print Type:</span>
+						{$selectedBook.printType ? $selectedBook.printType : 'Unknown'}
+					</li>
+					<li>
+						<span>Page Count:</span>
+						{$selectedBook.pageCount ? $selectedBook.pageCount : 'Unknown'}
+					</li>
+					<li>
+						<span>Language:</span>
+						{$selectedBook.language ? $selectedBook.language.toUpperCase() : 'Unknown'}
+					</li>
+					<li>
+						<span>Industry Identifier:</span>
+						{$selectedBook.industryIdentifiers
+							? $selectedBook.industryIdentifiers[0].identifier
+							: 'Unknown'}
+					</li>
+					<li>
+						<span>Categories:</span>
+						{$selectedBook.categories ? $selectedBook.categories.join(', ') : 'Unknown'}
+					</li>
+				</ul>
 			</div>
-		{/if}
-	</div>
-</section>
+			{#if $selectedBook.description}
+				<p class="dialog-description">{$selectedBook.description}</p>
+			{/if}
+			<div class="dialog-buttons">
+				<button class="button button-primary" on:click={() => addBook()}>Add book</button>
+				<button use:melt={$close} class="close-button button">Close</button>
+			</div>
+		</div>
+	{/if}
+</div>
 
 <style>
 	h1 {
@@ -235,21 +256,21 @@
 		display: block;
 	}
 
+	small {
+		font-size: 0.75rem;
+		color: var(--primary-black);
+		margin-bottom: 1rem;
+		width: 100%;
+		text-align: end;
+		font-family: var(--header-font);
+		text-transform: uppercase;
+		letter-spacing: 0.05rem;
+	}
+
 	.add-book-form {
 		display: flex;
 		flex-direction: column;
 		margin-bottom: 2rem;
-	}
-
-	.add-book-form form label {
-		display: flex;
-		gap: 0.75rem;
-	}
-
-	.add-book-form label input {
-		border: 2px solid var(--primary-colour-purple);
-		padding: 0.5rem;
-		width: 100%;
 	}
 
 	.book-info {
@@ -286,8 +307,67 @@
 		color: var(--primary-white);
 	}
 
-	.submit-button {
+	.button-group {
+		margin-top: 0.5rem;
+	}
+
+	.dialog h3 {
+		color: var(--primary-colour-purple);
+		font-size: 1.5rem;
+		line-height: 1.75rem;
+		font-family: var(--header-font);
+		font-weight: 600;
+		letter-spacing: 0.05rem;
+		margin-bottom: 0.75rem;
+	}
+
+	.input-group {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		margin-top: 1rem;
+		width: 100%;
+	}
+
+	.input-group input {
+		border: 2px solid var(--primary-colour-purple);
+		padding: 0.5rem;
+		margin-bottom: 0.5rem;
+		flex-grow: 1;
+		font-size: 0.9rem;
+		width: calc(100% - 30% - 5rem);
+	}
+	.input-group label {
+		align-items: center;
+		font-family: var(--header-font);
+		font-size: 0.9rem;
+		display: flex;
 		height: 2.75rem;
+		letter-spacing: 0.075rem;
+		text-transform: uppercase;
+		border: 2px solid var(--primary-grey);
+		color: var(--primary-black);
+		font-weight: 400;
+		background-color: var(--primary-grey);
+		min-width: 30%;
+		flex: 0 0 auto;
+		margin-bottom: 0.5rem;
+		justify-content: center;
+	}
+
+	.input-group span {
+		display: flex;
+		flex-direction: row;
+		gap: 0.5rem;
+		align-items: center;
+		width: 100%;
+		max-width: 100%;
+	}
+
+	@media (min-width: 590px) {
+		.add-book-form {
+			max-width: 80%;
+		}
 	}
 
 	@media (min-width: 768px) {
@@ -295,8 +375,15 @@
 		h4 span {
 			display: inline;
 		}
-		.add-book-form label input {
-			max-width: 400px;
+
+		.add-book-form {
+			max-width: 60%;
+		}
+	}
+
+	@media (min-width: 1024px) {
+		.add-book-form {
+			max-width: 50%;
 		}
 	}
 </style>

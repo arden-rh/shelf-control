@@ -7,6 +7,7 @@
 		updateUserLibraryBookshelves
 	} from '$lib/firebase/libraryFirestore';
 	import { addToast } from '$lib/components/Toaster.svelte';
+	import { allBookStore } from '$lib/stores/books.stores';
 	import { getUserBookshelves } from '$lib/firebase/userFirestore';
 	import { onDestroy } from 'svelte';
 	import { page } from '$app/stores';
@@ -14,11 +15,11 @@
 	import { userStore } from '$lib/stores/user.stores';
 	import { writable } from 'svelte/store';
 	import BookPage from '$lib/components/BookPage.svelte';
+	import BookshelfPage from '$lib/components/BookshelfPage.svelte';
 	import EditBookshelvesForm from '$lib/components/EditBookshelvesForm.svelte';
 	import type { AppUser, LoggedInUser } from '$lib/types/user.types';
 	import type { LibraryBookWithId } from '$lib/types/books.types';
 	import type { SessionState } from '$lib/types/session.types';
-	import { allBookStore } from '$lib/stores/books.stores';
 
 	let appUser: AppUser | undefined;
 	let book: LibraryBookWithId | undefined;
@@ -192,7 +193,7 @@
 	{#if bookId && book && !loading}
 		<BookPage {book} {user} />
 	{:else if bookshelf && !loading}
-		<p>hej</p>
+		<BookshelfPage {bookshelf} {user} />
 	{:else if noQuery && !loading}
 		<div class="library-container">
 			{#if books.length === 0}
@@ -256,7 +257,7 @@
 					<h2>All books</h2>
 					<div class="grid-container bookshelves-container">
 						{#each books as book}
-							<div class="grid-item">
+							<div class={books.length > 1 ? 'grid-item' : 'grid-item single'}>
 								<a href={`/profile/library?bookId=${book._id}`}>
 									<img src={book.imageLinks?.thumbnail} alt={book.title} />
 									<h3>{book.title}</h3>
@@ -462,11 +463,15 @@
 		width: 150px;
 		min-height: 150px;
 		overflow: hidden;
-		justify-self: center;
 		background-color: var(--primary-grey);
 		padding: 1rem;
 		box-shadow: 2px 2px 2px 0px rgba(0, 0, 0, 0.6);
 		cursor: pointer;
+		justify-self: center;
+	}
+
+	.grid-item.single {
+		justify-self: flex-start;
 	}
 
 	.grid-item a {
@@ -538,10 +543,6 @@
 			padding-bottom: 0.75rem;
 		}
 
-		.all-bookshelves-container a {
-			max-width: calc(25% - 1rem);
-		}
-
 		.bookshelves-container {
 			padding: 0.8rem 1.5rem 1.5rem 1.25rem;
 		}
@@ -551,18 +552,8 @@
 		}
 
 		.grid-item {
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			justify-content: flex-start;
-			text-align: center;
 			width: 180px;
 			min-height: 300px;
-			overflow: hidden;
-			justify-self: center;
-			background-color: var(--primary-grey);
-			padding: 1rem;
-			box-shadow: 2px 2px 2px 0px rgba(0, 0, 0, 0.6);
 		}
 
 		.grid-item img {
