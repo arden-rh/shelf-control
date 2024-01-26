@@ -2,7 +2,6 @@
  * Library Functions
  *
  */
-
 import { browser } from '$app/environment';
 import { collection, deleteDoc, doc, getDocs, updateDoc, /* writeBatch */ } from 'firebase/firestore';
 import { db, initializeFirebase } from './firebase.client';

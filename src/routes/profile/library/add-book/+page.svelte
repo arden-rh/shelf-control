@@ -6,11 +6,11 @@
 	import { goto } from '$app/navigation';
 	import { session } from '$lib/stores/session.stores';
 	import { toLibraryBook } from '$lib/utility/toLibraryBook';
+	import AddBookForm from '$lib/components/AddBookForm.svelte';
 	import type { LibraryBook, LibraryBookWithoutUserId, VolumeInfo } from '$lib/types/books.types';
 	import type { LoggedInUser } from '$lib/types/user.types';
 	import type { PageData } from './$types';
 	import type { SessionState } from '$lib/types/session.types';
-	import AddBookForm from '$lib/components/AddBookForm.svelte';
 
 	const q = writable('');
 	const author = writable('');

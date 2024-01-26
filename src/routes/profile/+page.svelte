@@ -97,7 +97,7 @@
 		}
 
 		try {
-			const response = await deleteUserAccount(userId);
+			const response = await deleteUserAccount();
 
 			if (response?.status === 'success') {
 				session.set({

@@ -3,14 +3,10 @@
 	import { userStore } from '$lib/stores/user.stores';
 	import { auth } from '$lib/firebase/firebase.client';
 	import { getUser } from '$lib/firebase/userFirestore';
-	import {
-		GoogleAuthProvider,
-		signInWithPopup,
-		signInWithEmailAndPassword,
-		type UserCredential
-	} from 'firebase/auth';
+	import { signInWithEmailAndPassword } from 'firebase/auth';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
+	import type { UserCredential } from 'firebase/auth';
 
 	let email: string = '';
 	let password: string = '';
@@ -78,9 +74,10 @@
 				</div>
 				<div class="button-group">
 					<button type="submit" class="button button-primary">Login</button>
-					<button type="button" class="button button-secondary" on:click={() => goto('/register')}>Register</button>
+					<button type="button" class="button button-secondary" on:click={() => goto('/register')}
+						>Register</button
+					>
 				</div>
-				
 			</form>
 		</div>
 

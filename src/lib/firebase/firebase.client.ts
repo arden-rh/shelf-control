@@ -10,7 +10,6 @@ const firebaseConfig = {
 	appId: import.meta.env.VITE_FIREBASE_APP_ID,
 	authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
 	projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-	useEmulator: import.meta.env.VITE_FIREBASE_USE_EMULATOR === 'true'
 };
 
 export let app: FirebaseApp;

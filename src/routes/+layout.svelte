@@ -1,7 +1,5 @@
 <script lang="ts">
-	import { app, auth } from '$lib/firebase/firebase.client';
-	import { browser } from '$app/environment';
-	import { createDropdownMenu, melt } from '@melt-ui/svelte';
+	import { auth } from '$lib/firebase/firebase.client';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { session } from '$lib/stores/session.stores';
@@ -22,15 +20,6 @@
 		favourites: 'users',
 		profilePicture: 'users'
 	};
-
-	const {
-		elements: { trigger, menu, item, separator, arrow },
-		builders: { createSubmenu, createMenuRadioGroup, createCheckboxItem },
-		states: { open }
-	} = createDropdownMenu({
-		forceVisible: true,
-		loop: true
-	});
 
 	session.subscribe((current: SessionState) => {
 		loading = current?.loading;
@@ -122,7 +111,6 @@
 </div>
 
 <style>
-	/* @import '../app.pcss'; */
 	@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap');
 	@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;500;600;700&display=swap');
 

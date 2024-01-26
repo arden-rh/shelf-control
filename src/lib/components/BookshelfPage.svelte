@@ -6,9 +6,8 @@
 	import { goto } from '$app/navigation';
 	import { onDestroy } from 'svelte';
 	import { updateUserLibraryBookshelves } from '$lib/firebase/libraryFirestore';
-	import { userStore } from '$lib/stores/user.stores';
 	import { writable } from 'svelte/store';
-	import type { AppUser, LoggedInUser } from '$lib/types/user.types';
+	import type { LoggedInUser } from '$lib/types/user.types';
 	import type { LibraryBookWithId } from '$lib/types/books.types';
 	import type { Writable } from 'svelte/store';
 
@@ -18,7 +17,6 @@
 	export let bookshelvesStore: Writable<string[]>;
 	let addingBookToBookshelf = false;
 	let allBooks: LibraryBookWithId[] = [];
-	let appUser: AppUser | undefined;
 	let bookshelfBooks: LibraryBookWithId[] = [];
 	let deletingBookshelf = false;
 	let newBookId: string = '';
@@ -36,13 +34,8 @@
 		allBooks = current;
 	});
 
-	const unsubscribeUserStore = userStore.subscribe((current: AppUser) => {
-		appUser = current;
-	});
-
 	onDestroy(() => {
 		unsubscribeBookStore();
-		unsubscribeUserStore();
 	});
 
 	const {

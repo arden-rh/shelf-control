@@ -2,7 +2,6 @@
  * User Functions 
  * 
  */
-
 import { browser } from "$app/environment";
 import { db, initializeFirebase } from "./firebase.client";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
@@ -86,7 +85,7 @@ export const getUserBookshelves = async (userId: string) => {
 };
 
 /** Delete a User */
-export const deleteUserAccount = async (userId: string) => {
+export const deleteUserAccount = async (/* userId: string */) => {
 
 	if (browser) {
 		await initializeFirebase().catch(console.error);

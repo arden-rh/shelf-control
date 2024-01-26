@@ -2,7 +2,6 @@
  * Book Functions
  *
  */
-
 import {
 	collection,
 	doc,
