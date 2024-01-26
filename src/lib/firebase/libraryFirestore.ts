@@ -4,7 +4,7 @@
  */
 
 import { browser } from '$app/environment';
-import { collection, deleteDoc, doc, getDocs, updateDoc } from 'firebase/firestore';
+import { collection, deleteDoc, doc, getDocs, updateDoc, /* writeBatch */ } from 'firebase/firestore';
 import { db, initializeFirebase } from './firebase.client';
 import type { LibraryBookWithId } from '$lib/types/books.types';
 
@@ -44,6 +44,59 @@ export const getUserLibraryBooks = async (userId: string) => {
 };
 
 /** Update Library Bookshelves */
+/**
+ * 
+ * @param userId 
+ * @param bookshelves 
+ * @param bookshelvesToDelete 
+ * @returns 
+ * 
+ * TODO: This function is not tested yet as I need to update the UI to send the bookshelvesToDelete array
+ */
+// export const updateUserLibraryBookshelves = async (
+// 	userId: string,
+// 	bookshelves: string[],
+// 	bookshelvesToDelete: string[] = []
+// ) => {
+// 	if (browser) {
+// 		await initializeFirebase().catch(console.error);
+// 	}
+
+// 	if (!db) {
+// 		console.warn('Firestore is not initialized');
+// 		return undefined;
+// 	}
+
+// 	try {
+// 		const userDocRef = doc(db, 'users', userId);
+// 		const userLibraryRef = collection(db, 'users', userId, 'library');
+// 		const batch = writeBatch(db);
+
+// 		const updatedUserBookshelves = bookshelves.filter(
+// 			(shelf) => !bookshelvesToDelete.includes(shelf)
+// 		);
+
+// 		batch.update(userDocRef, { allBookshelves: updatedUserBookshelves});
+
+// 		if (bookshelvesToDelete.length > 0) {
+//             const querySnapshot = await getDocs(userLibraryRef);
+//             querySnapshot.forEach(doc => {
+//                 const book: LibraryBookWithId = doc.data() as LibraryBookWithId;
+
+//                 if (book.bookshelves) {
+//                     const updatedBookshelves = book.bookshelves.filter(shelf => !bookshelvesToDelete.includes(shelf));
+//                     batch.update(doc.ref, { bookshelves: updatedBookshelves });
+//                 }
+//             });
+//         }
+// 		await batch.commit();
+// 		return { status: 'success', message: 'Bookshelves updated successfully' };
+// 	} catch (error) {
+// 		console.error('Error updating user bookshelves:', error);
+// 		throw error;
+// 	}
+// };
+
 export const updateUserLibraryBookshelves = async (userId: string, bookshelves: string[]) => {
 	if (browser) {
 		await initializeFirebase().catch(console.error);

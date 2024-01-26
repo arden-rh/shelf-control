@@ -10,7 +10,6 @@ export interface LoggedInUser {
 export interface AppUser extends LoggedInUser {
 	library?: LibraryBookWithId[];
 	allBookshelves?: string[];
-	currentlyReading?: string[];
 	favouriteShelf?: string;
 	favouriteBook?: string;
 	favouriteAuthor?: string;

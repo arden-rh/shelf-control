@@ -8,12 +8,12 @@
 	} from '$lib/firebase/libraryFirestore';
 	import { addToast } from '$lib/components/Toaster.svelte';
 	import { allBookStore } from '$lib/stores/books.stores';
+	import { bookshelvesStore } from '$lib/stores/books.stores';
 	import { getUserBookshelves } from '$lib/firebase/userFirestore';
 	import { onDestroy } from 'svelte';
 	import { page } from '$app/stores';
 	import { session } from '$lib/stores/session.stores';
 	import { userStore } from '$lib/stores/user.stores';
-	import { writable } from 'svelte/store';
 	import BookPage from '$lib/components/BookPage.svelte';
 	import BookshelfPage from '$lib/components/BookshelfPage.svelte';
 	import EditBookshelvesForm from '$lib/components/EditBookshelvesForm.svelte';
@@ -29,7 +29,6 @@
 	let user: LoggedInUser | null = null;
 	let editingBookshelves = false;
 	let deletingLibrary = false;
-	export const bookshelvesStore = writable([] as string[]);
 
 	$: if (user?.uid) {
 		loadBooks(user.uid);

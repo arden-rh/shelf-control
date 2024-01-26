@@ -3,6 +3,7 @@ import type { LibraryBookWithId } from "$lib/types/books.types";
 
 export const favouriteBooksStore = writable<LibraryBookWithId[]>([]);
 export const allBookStore = writable<LibraryBookWithId[]>([]);
+export const bookshelvesStore = writable([] as string[]);
 
 export function removeBookFromAllBooks(bookId: string) {
     allBookStore.update((allBooks) => {

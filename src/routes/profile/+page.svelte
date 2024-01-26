@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { addToast } from '$lib/components/Toaster.svelte';
+	import { bookshelvesStore } from '$lib/stores/books.stores';
 	import { createDialog, melt } from '@melt-ui/svelte';
 	import { deleteUserAccount, getUserBookshelves } from '$lib/firebase/userFirestore';
 	import { favouriteBooksStore } from '$lib/stores/books.stores';
@@ -8,8 +9,10 @@
 	import { onDestroy } from 'svelte';
 	import { session } from '$lib/stores/session.stores';
 	import { updateUser } from '$lib/firebase/userFirestore';
+	import { updateUserLibraryBookshelves } from '$lib/firebase/libraryFirestore';
 	import { userStore } from '$lib/stores/user.stores';
 	import { writable } from 'svelte/store';
+	import EditBookshelvesForm from '$lib/components/EditBookshelvesForm.svelte';
 	import EditUserForm from '$lib/components/EditUserForm.svelte';
 	import type { AppUser, LoggedInUser } from '$lib/types/user.types';
 	import type { LibraryBookWithId } from '$lib/types/books.types';
@@ -23,6 +26,7 @@
 	let appUser: AppUser | undefined;
 	let displayName: string | undefined = undefined;
 	let editingUserProfile = false;
+	let editingBookshelves = false;
 	let userId: string | undefined | null = undefined;
 	let loading: boolean = true;
 
@@ -61,12 +65,24 @@
 		getFavouriteShelf();
 	}
 
+	$: if (!$open) {
+		editingBookshelves = false;
+		editingUserProfile = false;
+	}
+
+	$: bookshelves = $bookshelvesStore;
+
+
 	function openBook(book: LibraryBookWithId) {
 		selectedBook.set(book);
 	}
 
 	function editUser() {
 		editingUserProfile = true;
+	}
+
+	function editBookShelves() {
+		editingBookshelves = true;
 	}
 
 	function handleCancel() {
@@ -127,6 +143,38 @@
 					title: 'Error',
 					description: 'Failed to delete user',
 					status: 'error',
+				}
+			});
+		}
+	}
+
+	async function handleUpdateBookshelves(event: CustomEvent) {
+		const formData = event.detail;
+
+		if (!user || !user.uid) {
+			return;
+		}
+		try {
+			await updateUserLibraryBookshelves(user.uid, formData.bookshelves);
+
+			bookshelvesStore.set(formData.bookshelves);
+
+			editingBookshelves = false;
+			$open = false;
+
+			addToast({
+				data: {
+					title: 'Success',
+					description: 'Bookshelves updated successfully',
+					status: 'success'
+				}
+			});
+		} catch (error) {
+			addToast({
+				data: {
+					title: 'Error',
+					description: 'Failed to update bookshelves',
+					status: 'error'
 				}
 			});
 		}
@@ -239,12 +287,14 @@
 					<button on:click={editUser} use:melt={$trigger} class="button button-action"
 						>Edit profile</button
 					>
-					<button class="button button-action">Edit bookshelves</button>
+					<button on:click={editBookShelves} use:melt={$trigger} class="button button-action"
+					>Edit Bookshelves</button
+				>
 				</div>
 			{/if}
 			<section class="profile-info">
 				<div class="profile-image">
-					<img src="/images/profile-pic_2.png" alt="profile picture" />
+					<img src="/images/profile-pic_2.png" alt="an illustration of a stack of books"/>
 				</div>
 				<div class="profile-details">
 					<ul>
@@ -340,7 +390,7 @@
         rounded-md p-6 shadow-lg"
 			use:melt={$content}
 		>
-			{#if $selectedBook && !editingUserProfile}
+			{#if $selectedBook && !editingUserProfile && !editingBookshelves}
 				<h3 class="dialog-book-title" use:melt={$title}>{$selectedBook.title}</h3>
 				<div class="dialog-cover-info">
 					<ul>
@@ -381,7 +431,7 @@
 					<a class="button button-primary" href={`profile/library?bookId=${$selectedBook._id}`}
 						>Go to book page</a
 					>
-					<button use:melt={$close} class="button button-close"> Close </button>
+					<button use:melt={$close} class="button button-close">Close</button>
 				</div>
 			{:else if editingUserProfile && appUser}
 				<EditUserForm
@@ -400,6 +450,12 @@
 					on:cancel={handleCancel}
 					on:submit={handleUpdateUser}
 					on:delete={handleDeleteUser}
+				/>
+				{:else if editingBookshelves}
+				<EditBookshelvesForm
+					{bookshelves}
+					on:cancel={handleCancel}
+					on:save={handleUpdateBookshelves}
 				/>
 			{/if}
 		</div>

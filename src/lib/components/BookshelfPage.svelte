@@ -106,55 +106,37 @@
 		}
 	}
 
+	/**
+	 * TODO: Update user library bookshelves and remove bookshelf from all books
+	 *
+	 */
 	async function deleteBookshelf() {
 		if (!user || !user.uid) {
 			return;
 		}
 
 		try {
-			if (bookshelfBooks.length > 0) {
-				for (const book of bookshelfBooks) {
-					const updatedBookshelves = book.bookshelves!.filter((shelf) => shelf !== bookshelf);
-					const bookUpdateResponse = await updateLibraryBookBookshelves(
-						user.uid,
-						book._id,
-						updatedBookshelves
-					);
-					if (bookUpdateResponse?.status !== 'success') {
-						throw new Error(
-							bookUpdateResponse?.message || `Failed to update bookshelves for book ${book.title}`
-						);
-					}
-				}
-			}
+			const currentBookshelves = $bookshelvesStore;
 
-			const currentBookshelves = appUser?.allBookshelves || [];
-			const updatedBookshelves = currentBookshelves.filter((shelf) => shelf !== bookshelf);
+			const updatedBookshelves = currentBookshelves.filter(
+				(bookshelfName) => bookshelfName !== bookshelf
+			);
+
 			const response = await updateUserLibraryBookshelves(user.uid, updatedBookshelves);
 
-			if (response?.status !== 'success') {
+			if (response?.status === 'success') {
+				$bookshelvesStore = updatedBookshelves;
+
+				goto('/profile/library');
+
 				addToast({
 					data: {
-						title: 'Error',
-						description: 'Failed to delete bookshelf',
-						status: 'error'
+						title: 'Success',
+						description: 'Bookshelf deleted successfully',
+						status: 'success'
 					}
 				});
 			}
-
-			getBookshelfBooks();
-			bookshelvesStore.update((currentBookshelves) => {
-				return currentBookshelves.filter((shelf) => shelf !== bookshelf);
-			});
-			goto('/profile/library');
-
-			addToast({
-				data: {
-					title: 'Success',
-					description: 'Bookshelf deleted successfully',
-					status: 'success'
-				}
-			});
 		} catch (error) {
 			addToast({
 				data: {
