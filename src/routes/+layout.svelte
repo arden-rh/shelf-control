@@ -122,7 +122,7 @@
 </div>
 
 <style>
-	@import '../app.pcss';
+	/* @import '../app.pcss'; */
 	@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap');
 	@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;500;600;700&display=swap');
 

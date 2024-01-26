@@ -3,6 +3,7 @@
 import { browser } from '$app/environment';
 import { onAuthStateChanged } from 'firebase/auth';
 import { initializeFirebase, auth } from '$lib/firebase/firebase.client';
+import '../app.pcss'
 
 export async function load({ url }) {
 	if (browser) {
