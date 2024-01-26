@@ -1,12 +1,10 @@
 <script lang="ts">
 	import { createLibraryBook } from '$lib/hooks/createLibraryBook.client';
 	import { createDialog, melt } from '@melt-ui/svelte';
-	import { faRectangleXmark } from '@fortawesome/free-solid-svg-icons';
 	import { get, writable } from 'svelte/store';
 	import { goto } from '$app/navigation';
 	import { session } from '$lib/stores/session.stores';
 	import { toLibraryBook } from '$lib/utility/toLibraryBook';
-	import { useQuery } from '@sveltestack/svelte-query';
 	import type { LibraryBook, VolumeInfo } from '$lib/types/books.types';
 	import type { PageData } from './$types';
 	import type { SessionState } from '$lib/types/session.types';

@@ -4,7 +4,6 @@
 	import { createDropdownMenu, melt } from '@melt-ui/svelte';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
-	import { QueryClient, QueryClientProvider } from '@sveltestack/svelte-query';
 	import { session } from '$lib/stores/session.stores';
 	import { signOut } from 'firebase/auth';
 	import { userStore } from '$lib/stores/user.stores';

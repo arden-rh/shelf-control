@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { addUniqueBookshelvesAndUpdateUser } from '$lib/firebase/bookFirestore';
 	import { createEventDispatcher } from 'svelte';
 
 	const dispatch = createEventDispatcher();
