@@ -28,8 +28,8 @@
 		<div
 			use:melt={$content(id)}
 			animate:flip={{ duration: 500 }}
-			in:fly={{ duration: 150, x: '100%' }}
-			out:fly={{ duration: 150, x: '100%' }}
+			in:fly|global={{ duration: 150, x: '100%' }}
+			out:fly|global={{ duration: 150, x: '100%' }}
 			class="bg-toast shadow-md"
 		>
 			<div
