@@ -1,10 +1,49 @@
 /* Write your global styles here, in PostCSS syntax */
+
+/* Imports */
+
+/*Tailwind */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Global Styles */
+/** Variables */
 
+/* Colour Variables */
+:root {
+	/* Colours */
+	--primary-black: #0d0d0d;
+	--primary-grey: #d2d7df;
+	/* --primary-grey: #E8E9EB; */ /* lighter */
+	--secondary-grey: #9fa0c3;
+	--primary-white: #f2f2f2;
+	/* --primary-white: #F9F8F8; */
+	/* --primary-white: #E6E6E9; */
+	/* --primary-white: #E9FFF9; */
+	/* --primary-white: #EAEAEA; */
+	--primary-colour-purple: #34228a;
+	--secondary-colour-purple: #beb8eb;
+
+	/* Accent colours*/
+	--accent-pink-purple: #b298dc;
+	--accent-purple: #8b6adc;
+	--accent-purple: #977be0;
+	--accent-dark-purple: #261863;
+	--accent-light-purple: #a288e3;
+	--accent-light-purple: #b19ce8;
+	--accent-blue-grey: #a2bce0; /* doesn't work with #beb8eb */
+	--accent-dark-blue-grey: #7b99c3;
+	--accent-light-blue-grey: #b8d0eb;
+	--accent-light-blue-grey: #bfd7ea; /* like this one */
+	--accent-light-grey: #c1dbe3;
+	--accent-light-blue: #bce7fd; /* like this one */
+
+	/* Fonts */
+	--header-font: 'Oswald', sans-serif;
+	--body-font: 'Merriweather', serif;
+}
+
+/* Global Styles */
 html {
 	box-sizing: border-box;
 }
@@ -75,6 +114,7 @@ section {
 	max-width: 1200px;
 }
 
+/* Button styles */
 .button {
 	align-items: center;
 	font-family: var(--header-font);
@@ -85,30 +125,26 @@ section {
 	padding: 0 0.75rem;
 	text-transform: uppercase;
 	font-weight: 400;
+	color: var(--primary-black);
+	box-shadow: 2px 2px 2px 0px rgba(0, 0, 0, 0.6);
 }
 
 .button-primary {
 	background-color: var(--accent-blue-grey);
 	border: 4px solid var(--accent-dark-blue-grey);
-	color: var(--primary-black);
-	box-shadow: 2px 2px 2px 0px rgba(0, 0, 0, 0.6);
 }
 
 .button-primary:hover {
-	background-color: var(--secondary-colour-purple);
-	border-color: var(--accent-pink-purple);
+	background-color: var(--accent-dark-blue-grey);
 }
 
 .button-secondary {
 	background-color: var(--secondary-colour-purple);
-	color: var(--primary-colour-purple);
 	border: 4px solid var(--accent-pink-purple);
-	box-shadow: 2px 2px 2px 0px rgba(0, 0, 0, 0.6);
 }
 
 .button-secondary:hover {
-	background-color: var(--accent-light-purple);
-	border-color: var(--accent-purple);
+	background-color: var(--accent-pink-purple);
 }
 
 .button-delete {
@@ -119,8 +155,35 @@ section {
 
 .button-delete:hover {
 	background-color: var(--primary-colour-purple);
-	border-color: var(--accent-dark-purple);
+	border-color: var(--primary-colour-purple);
 	color: var(--primary-white);
+}
+
+.button-action {
+	font-size: 0.7rem;
+	height: fit-content;
+	padding: 0.4rem 0.8rem;
+	background-color: var(--accent-blue-grey);
+	line-height: 0.9rem;
+	text-align: center;
+}
+
+.button-action:hover {
+	background-color: var(--accent-dark-blue-grey);
+}
+
+.button-close {
+	background-color: transparent;
+	color: var(--primary-colour-purple);
+	border: none;
+	display: flex;
+	align-items: center;
+	height: fit-content;
+	box-shadow: none;
+}
+
+.button-close:hover {
+	color: var(--accent-pink-purple);
 }
 
 .button-group {
@@ -163,19 +226,6 @@ section {
 }
 
 /* Dialog Styles */
-.close-button {
-	background-color: transparent;
-	color: var(--primary-colour-purple);
-	border: none;
-	display: flex;
-	align-items: center;
-	height: fit-content;
-}
-
-.close-button:hover {
-	color: var(--secondary-colour-purple);
-}
-
 .dialog {
 	background-color: var(--primary-white);
 }
@@ -187,6 +237,7 @@ section {
 	font-weight: 600;
 	letter-spacing: 0.05rem;
 	margin-bottom: 0.75rem;
+	text-transform: uppercase;
 }
 
 .dialog-buttons {
@@ -240,11 +291,11 @@ section {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	width: 100px;
-	height: 9rem;
+	width: 140px;
+	height: 200px;
 	background-color: var(--accent-pink-purple);
 	color: var(--primary-colour-purple);
-	font-size: 1.25rem;
+	font-size: 1rem;
 	font-family: var(--header-font);
 	text-transform: uppercase;
 	letter-spacing: 0.05rem;
@@ -276,40 +327,3 @@ section {
 		margin: 1rem 0 3rem;
 	}
 }
-
-/* Colour Variables */
-:root {
-	/* Colours */
-	--primary-black: #0d0d0d;
-	--primary-grey: #d2d7df;
-	/* --primary-grey: #E8E9EB; */ /* lighter */
-	--secondary-grey: #9fa0c3;
-	--primary-white: #f2f2f2;
-	/* --primary-white: #F9F8F8; */
-	/* --primary-white: #E6E6E9; */
-	/* --primary-white: #E9FFF9; */
-	/* --primary-white: #EAEAEA; */
-	--primary-colour-purple: #34228a;
-	--secondary-colour-purple: #beb8eb;
-
-	/* Accent colours*/
-	--accent-pink-purple: #b298dc;
-	--accent-purple: #8b6adc;
-	--accent-purple: #977be0;
-	--accent-dark-purple: #261863;
-	--accent-light-purple: #a288e3;
-	--accent-light-purple: #b19ce8;
-	--accent-blue-grey: #a2bce0; /* doesn't work with #beb8eb */
-	--accent-dark-blue-grey: #7b99c3;
-	--accent-light-blue-grey: #b8d0eb;
-	--accent-light-blue-grey: #bfd7ea; /* like this one */
-	--accent-light-grey: #c1dbe3;
-	--accent-light-blue: #bce7fd; /* like this one */
-
-	/* Fonts */
-	--header-font: 'Oswald', sans-serif;
-	--body-font: 'Merriweather', serif;
-}
-/* Colour Palette
-
-*/

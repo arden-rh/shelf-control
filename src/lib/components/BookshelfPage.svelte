@@ -69,17 +69,15 @@
 	<div class="bookshelf-container">
 		{#if bookshelfBooks.length > 0}
 			<div class="bookshelf-actions">
-				<a href="/profile/library" class="button button-primary">Library</a>
-				<button
-					on:click={handleAddBookToBookshelf}
-					use:melt={$trigger}
-					class="button button-primary">Add book to bookshelf</button
+				<a href="/profile/library" class="button button-action">Library</a>
+				<button on:click={handleAddBookToBookshelf} use:melt={$trigger} class="button button-action"
+					>Add book</button
 				>
-				<button on:click={handleEditBookshelves} use:melt={$trigger} class="button button-primary"
-					>Edit Bookshelf</button
+				<button on:click={handleEditBookshelves} use:melt={$trigger} class="button button-action"
+					>Edit bookshelf</button
 				>
-				<button on:click={handleDeleteBookshelf} use:melt={$trigger} class="button button-primary"
-					>Delete Bookshelf</button
+				<button on:click={handleDeleteBookshelf} use:melt={$trigger} class="button button-action"
+					>Delete bookshelf</button
 				>
 			</div>
 			<div class="grid-container bookshelves-container">
@@ -94,14 +92,12 @@
 			</div>
 		{:else}
 			<div class="bookshelf-actions">
-				<a href="/profile/library" class="button button-primary">Library</a>
-				<button
-					on:click={handleAddBookToBookshelf}
-					use:melt={$trigger}
-					class="button button-primary">Add book to bookshelf</button
+				<a href="/profile/library" class="button button-action">Library</a>
+				<button on:click={handleAddBookToBookshelf} use:melt={$trigger} class="button button-action"
+					>Add book to bookshelf</button
 				>
-				<button on:click={handleEditBookshelves} use:melt={$trigger} class="button button-primary"
-					>Edit Bookshelf</button
+				<button on:click={handleEditBookshelves} use:melt={$trigger} class="button button-action"
+					>Edit bookshelf</button
 				>
 			</div>
 			<p>No books added to this bookshelf yet.</p>
@@ -141,10 +137,6 @@
 		text-transform: uppercase;
 		font-size: 1.5rem;
 		align-self: flex-start;
-		border-bottom: 8px solid var(--secondary-colour-purple);
-		box-shadow: inset 0px -4px 0px 0px var(--accent-pink-purple);
-		padding-bottom: 0.5rem;
-		width: 100%;
 		line-height: 1.75rem;
 	}
 
@@ -156,11 +148,8 @@
 	}
 
 	section {
-		display: flex;
-		flex-direction: column;
+		padding: 0;
 		align-items: center;
-		justify-content: center;
-		max-width: 1000px;
 	}
 
 	.bookshelf-container {
@@ -217,12 +206,8 @@
 		align-items: stretch;
 		align-self: flex-end;
 	}
-	.bookshelf-actions .button {
-		font-size: 0.7rem;
-		padding: 0.75rem 1rem;
-		border: none;
-		line-height: 1rem;
-		min-height: 2.5rem;
+	.button-action {
+		min-height: 2.75rem;
 	}
 
 	.grid-container {
@@ -232,6 +217,7 @@
 		justify-content: flex-start;
 		width: 100%;
 		flex-wrap: wrap;
+		margin-bottom: 5rem;
 	}
 
 	.grid-item {
@@ -282,6 +268,12 @@
 		word-wrap: break-word;
 	}
 
+	@media (min-width: 450px) {
+		.button-action {
+			min-height: fit-content;
+		}
+	}
+
 	@media (min-width: 590px) {
 		.bookshelves-container {
 			border: 12px solid var(--secondary-colour-purple);
@@ -297,8 +289,8 @@
 
 	@media (min-width: 768px) {
 		h2 {
-			font-size: 2.5rem;
-			padding-bottom: 0.75rem;
+			font-size: 2rem;
+			line-height: 2.25rem;
 		}
 
 		.bookshelves-container {

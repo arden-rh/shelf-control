@@ -3,17 +3,17 @@
 	import { createDialog, melt } from '@melt-ui/svelte';
 	import { deleteLibraryBook } from '$lib/hooks/deleteLibraryBook.client';
 	import { editLibraryBook } from '$lib/hooks/editLibraryBook.client';
-	import { writable } from 'svelte/store';
 	import { goto } from '$app/navigation';
+	import { writable } from 'svelte/store';
 	import {
 		addUniqueBookshelvesAndUpdateUser,
 		updateLibraryBookReadingStatus
 	} from '$lib/firebase/bookFirestore';
+	import { removeBookFromAllBooks } from '$lib/stores/books.stores';
 	import EditBookForm from './EditBookForm.svelte';
 	import EditBookshelvesForm from './EditBookshelvesForm.svelte';
 	import type { LibraryBookWithId } from '$lib/types/books.types';
 	import type { LoggedInUser } from '$lib/types/user.types';
-	import { removeBookFromAllBooks } from '$lib/stores/books.stores';
 
 	export let book: LibraryBookWithId;
 	export let user: LoggedInUser | null = null;
@@ -203,14 +203,13 @@
 	<h2>{book.title}</h2>
 	<div class="book-page-container">
 		<div class="book-actions">
-			<a href="/profile/library" class="button button-primary">Library</a>
-			<button on:click={editBook} use:melt={$trigger} class="button button-primary"
-				>Edit Book</button
+			<a href="/profile/library" class="button button-action">Library</a>
+			<button on:click={editBook} use:melt={$trigger} class="button button-action">Edit Book</button
 			>
-			<button on:click={editBookshelves} use:melt={$trigger} class="button button-primary"
+			<button on:click={editBookshelves} use:melt={$trigger} class="button button-action"
 				>Edit Bookshelves</button
 			>
-			<button on:click={handleDelete} use:melt={$trigger} class="button button-primary"
+			<button on:click={handleDelete} use:melt={$trigger} class="button button-action"
 				>Delete Book</button
 			>
 		</div>
@@ -218,11 +217,7 @@
 			<div class="book-info">
 				<div class="book-image">
 					{#if book.imageLinks?.thumbnail}
-						<img
-							src={book.imageLinks.thumbnail}
-							alt={book.title}
-							class="object-cover object-center"
-						/>
+						<img src={book.imageLinks.thumbnail} alt={book.title} />
 					{:else}
 						<div class="placeholder-thumbnail">Cover Missing</div>
 					{/if}
@@ -356,10 +351,6 @@
 		text-transform: uppercase;
 		font-size: 1.5rem;
 		align-self: flex-start;
-		border-bottom: 8px solid var(--secondary-colour-purple);
-		box-shadow: inset 0px -4px 0px 0px var(--accent-pink-purple);
-		padding-bottom: 0.5rem;
-		width: 100%;
 		line-height: 1.75rem;
 	}
 
@@ -430,13 +421,10 @@
 		justify-content: center;
 		margin-bottom: 1rem;
 		align-items: stretch;
+		align-self: flex-end;
 	}
-	.book-actions .button {
-		font-size: 0.7rem;
-		padding: 0.75rem 1rem;
-		border: none;
-		line-height: 1rem;
-		min-height: 2.5rem;
+	.button-action {
+		min-height: 2.75rem;
 	}
 
 	.book-description {
@@ -510,15 +498,18 @@
 		font-size: 0.9rem;
 	}
 
+	@media (min-width: 400px) {
+		.button-action {
+			min-height: fit-content;
+		}
+	}
+
 	@media (min-width: 768px) {
 		h2 {
 			font-size: 2rem;
 			line-height: 2.25rem;
 		}
 
-		.book-actions {
-			align-self: flex-end;
-		}
 		.book-description {
 			max-width: 60%;
 		}
@@ -544,6 +535,12 @@
 		.book-info-container {
 			flex-direction: row;
 			justify-content: flex-end;
+		}
+
+		.placeholder-thumbnail {
+			width: 100%;
+			height: 300px;
+			font-size: 1.25rem;
 		}
 	}
 </style>

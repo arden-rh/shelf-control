@@ -6,15 +6,18 @@
 	import { goto } from '$app/navigation';
 	import { session } from '$lib/stores/session.stores';
 	import { toLibraryBook } from '$lib/utility/toLibraryBook';
-	import type { LibraryBook, VolumeInfo } from '$lib/types/books.types';
+	import type { LibraryBook, LibraryBookWithoutUserId, VolumeInfo } from '$lib/types/books.types';
 	import type { LoggedInUser } from '$lib/types/user.types';
 	import type { PageData } from './$types';
 	import type { SessionState } from '$lib/types/session.types';
+	import AddBookForm from '$lib/components/AddBookForm.svelte';
 
 	const q = writable('');
 	const author = writable('');
 	const selectedBook = writable({} as VolumeInfo);
 	let user: LoggedInUser | null = null;
+	let addingBookManually = false;
+	let viewingBook = false;
 
 	export let data: PageData;
 
@@ -27,16 +30,68 @@
 		user = current?.user;
 	});
 
+	$: if (!$open) {
+		addingBookManually = false;
+		viewingBook = false;
+	}
+
 	function openDialog(book: VolumeInfo) {
+		viewingBook = true;
 		selectedBook.set(book);
+	}
+
+	function handleAddBookManually() {
+		addingBookManually = true;
+	}
+
+
+	async function handleAddingBookManually(event: CustomEvent) {
+		if (!user || !user.uid) {
+			return;
+		}
+
+		const formData = event.detail;
+
+		formData.industryIdentifier
+
+		console.log('formData', formData);
+
+		const bookValue = toLibraryBook(formData, true);
+
+		const userId = user.uid;
+
+		const book: LibraryBook = {
+			...bookValue,
+			userId
+		};
+
+		const response = await createLibraryBook(userId, book);
+
+		if (response?.success) {
+			addToast({
+				data: {
+					title: 'Book added',
+					description: `${formData.title} has been added to your library`,
+					status: 'success'
+				}
+			});
+
+			goto(`/profile/library?bookId=${response.bookId}`);
+		} else {
+			addToast({
+				data: {
+					title: 'Failed to add book',
+					description: `Failed to add ${formData.title} to your library`,
+					status: 'error'
+				}
+			});
+		}
 	}
 
 	async function addBook() {
 		const selectedBookValue = get(selectedBook);
 
 		const bookValue = toLibraryBook(selectedBookValue);
-
-		console.log('Book value:', bookValue);
 
 		if (!user || !user.uid) {
 			return;
@@ -62,7 +117,13 @@
 
 			goto(`/profile/library?bookId=${response.bookId}`);
 		} else {
-			console.error('Failed to add book:', response?.error);
+			addToast({
+				data: {
+					title: 'Failed to add book',
+					description: `Failed to add ${book.title} to your library`,
+					status: 'error'
+				}
+			});
 		}
 	}
 </script>
@@ -71,8 +132,17 @@
 	<div class="page-header">
 		<h1>Add a book</h1>
 	</div>
-	<div class="add-book-form">
+	<div class="add-book-header-container">
 		<h2>Search for a book</h2>
+
+		<div class="button-group">
+			<button class="button button-primary" use:melt={$trigger} on:click={handleAddBookManually}
+				>Add your own book</button
+			>
+			<a href="/profile/library" class="button button-primary">Go to Library</a>
+		</div>
+	</div>
+	<div class="add-book-form">
 		<form data-sveltekit-keepfocus action="/profile/library/add-book" method="get">
 			<div class="input-group">
 				<span>
@@ -154,7 +224,7 @@
 </section>
 <!-- Dialog -->
 <div use:melt={$portalled}>
-	{#if $open && $selectedBook}
+	{#if $open}
 		<div class="fixed inset-0 z-50 bg-black/50" use:melt={$overlay} />
 		<div
 			class="dialog fixed left-[50%] top-[50%] z-50 max-h-[85vh]
@@ -162,61 +232,65 @@
             rounded-md p-6 shadow-lg"
 			use:melt={$content}
 		>
-			<h3 use:melt={$title}>{$selectedBook.title}</h3>
-			<div class="dialog-cover-info">
-				{#if $selectedBook.imageLinks?.thumbnail}
-					<img src={$selectedBook.imageLinks.thumbnail} alt={$selectedBook.title} />
-				{:else}
-					<div class="placeholder-thumbnail">Cover Missing</div>
+			{#if $selectedBook && viewingBook}
+				<h3 use:melt={$title}>{$selectedBook.title}</h3>
+				<div class="dialog-cover-info">
+					{#if $selectedBook.imageLinks?.thumbnail}
+						<img src={$selectedBook.imageLinks.thumbnail} alt={$selectedBook.title} />
+					{:else}
+						<div class="placeholder-thumbnail">Cover Missing</div>
+					{/if}
+					<ul>
+						<li>
+							<span
+								>{$selectedBook.authors && $selectedBook.authors.length > 1
+									? 'Authors: '
+									: 'Author: '}</span
+							>
+							{$selectedBook.authors ? $selectedBook.authors.join(', ') : 'N/A'}
+						</li>
+						<li>
+							<span>Publisher:</span>
+							{$selectedBook.publisher ? $selectedBook.publisher : 'Unknown'}
+						</li>
+						<li>
+							<span>Published:</span>
+							{$selectedBook.publishedDate ? $selectedBook.publishedDate : 'Unknown'}
+						</li>
+						<li>
+							<span>Print Type:</span>
+							{$selectedBook.printType ? $selectedBook.printType : 'Unknown'}
+						</li>
+						<li>
+							<span>Page Count:</span>
+							{$selectedBook.pageCount ? $selectedBook.pageCount : 'Unknown'}
+						</li>
+						<li>
+							<span>Language:</span>
+							{$selectedBook.language ? $selectedBook.language.toUpperCase() : 'Unknown'}
+						</li>
+						<li>
+							<span>Industry Identifier:</span>
+							{$selectedBook.industryIdentifiers
+								? $selectedBook.industryIdentifiers[0].identifier
+								: 'Unknown'}
+						</li>
+						<li>
+							<span>Categories:</span>
+							{$selectedBook.categories ? $selectedBook.categories.join(', ') : 'Unknown'}
+						</li>
+					</ul>
+				</div>
+				{#if $selectedBook.description}
+					<p class="dialog-description">{$selectedBook.description}</p>
 				{/if}
-				<ul>
-					<li>
-						<span
-							>{$selectedBook.authors && $selectedBook.authors.length > 1
-								? 'Authors: '
-								: 'Author: '}</span
-						>
-						{$selectedBook.authors ? $selectedBook.authors.join(', ') : 'N/A'}
-					</li>
-					<li>
-						<span>Publisher:</span>
-						{$selectedBook.publisher ? $selectedBook.publisher : 'Unknown'}
-					</li>
-					<li>
-						<span>Published:</span>
-						{$selectedBook.publishedDate ? $selectedBook.publishedDate : 'Unknown'}
-					</li>
-					<li>
-						<span>Print Type:</span>
-						{$selectedBook.printType ? $selectedBook.printType : 'Unknown'}
-					</li>
-					<li>
-						<span>Page Count:</span>
-						{$selectedBook.pageCount ? $selectedBook.pageCount : 'Unknown'}
-					</li>
-					<li>
-						<span>Language:</span>
-						{$selectedBook.language ? $selectedBook.language.toUpperCase() : 'Unknown'}
-					</li>
-					<li>
-						<span>Industry Identifier:</span>
-						{$selectedBook.industryIdentifiers
-							? $selectedBook.industryIdentifiers[0].identifier
-							: 'Unknown'}
-					</li>
-					<li>
-						<span>Categories:</span>
-						{$selectedBook.categories ? $selectedBook.categories.join(', ') : 'Unknown'}
-					</li>
-				</ul>
-			</div>
-			{#if $selectedBook.description}
-				<p class="dialog-description">{$selectedBook.description}</p>
+				<div class="dialog-buttons">
+					<button class="button button-primary" on:click={() => addBook()}>Add book</button>
+					<button use:melt={$close} class="button button-close">Close</button>
+				</div>
+			{:else if addingBookManually}
+				<AddBookForm on:submit={handleAddingBookManually} on:cancel={() => ($open = false)} />
 			{/if}
-			<div class="dialog-buttons">
-				<button class="button button-primary" on:click={() => addBook()}>Add book</button>
-				<button use:melt={$close} class="close-button button">Close</button>
-			</div>
 		</div>
 	{/if}
 </div>
@@ -227,18 +301,11 @@
 	}
 
 	h2 {
-		font-size: 1.2rem;
-		letter-spacing: 0.025rem;
-		text-transform: uppercase;
-	}
-
-	h3 {
-		font-size: 1rem;
-		line-height: 1.25rem;
-		margin-bottom: 0.25rem;
-		color: var(--primary-black);
-		font-weight: 400;
-		text-transform: uppercase;
+		margin-bottom: 0.75rem;
+		line-height: 1.75rem;
+		border-bottom: 8px solid var(--secondary-colour-purple);
+		box-shadow: inset 0 -4px 0px 0px var(--accent-pink-purple);
+		padding-bottom: 0.5rem;
 	}
 
 	h4 {
@@ -267,6 +334,13 @@
 		letter-spacing: 0.05rem;
 	}
 
+	.add-book-header-container {
+		display: flex;
+		justify-content: space-between;
+		width: 100%;
+		align-items: flex-start;
+	}
+
 	.add-book-form {
 		display: flex;
 		flex-direction: column;
@@ -290,35 +364,38 @@
 		background-color: var(--secondary-colour-purple);
 	}
 
+	.book-list-item h3 {
+		font-size: 1rem;
+		line-height: 1.25rem;
+		margin-bottom: 0.25rem;
+		color: var(--primary-black);
+		font-weight: 400;
+		text-transform: uppercase;
+	}
+
 	.book-list-item:nth-child(even) {
 		background-color: var(--accent-light-blue-grey);
 	}
 
 	.book-list-item:hover {
-		background-color: var(--primary-colour-purple);
-		color: var(--primary-white);
+		background-color: var(--accent-dark-blue-grey);
 	}
 	.book-list-item-button {
 		width: 100%;
 		padding: 1rem;
 	}
 
-	.book-list-item-button:hover h3 {
-		color: var(--primary-white);
-	}
-
 	.button-group {
 		margin-top: 0.5rem;
+		align-self: flex-start;
+	}
+
+	.dialog {
+		overflow-y: scroll;
 	}
 
 	.dialog h3 {
 		color: var(--primary-colour-purple);
-		font-size: 1.5rem;
-		line-height: 1.75rem;
-		font-family: var(--header-font);
-		font-weight: 600;
-		letter-spacing: 0.05rem;
-		margin-bottom: 0.75rem;
 	}
 
 	.input-group {
@@ -371,6 +448,11 @@
 	}
 
 	@media (min-width: 768px) {
+		h2 {
+			font-size: 2.5rem;
+			padding-bottom: 0.75rem;
+		}
+
 		h3 span,
 		h4 span {
 			display: inline;

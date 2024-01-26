@@ -234,16 +234,17 @@
 		<div class="profile-container">
 			{#if appUser}
 				<div class="profile-actions">
-					<a href="/profile/library/add-book" class="button button-primary">Add a book</a>
-					<button on:click={editUser} use:melt={$trigger} class="button button-primary"
+					<a href="/profile/library" class="button button-action">Library</a>
+					<a href="/profile/library/add-book" class="button button-action">Add a book</a>
+					<button on:click={editUser} use:melt={$trigger} class="button button-action"
 						>Edit profile</button
 					>
-					<button class="button button-primary">Edit bookshelves</button>
+					<button class="button button-action">Edit bookshelves</button>
 				</div>
 			{/if}
 			<section class="profile-info">
 				<div class="profile-image">
-					<img src="https://via.placeholder.com/150" alt="profile picture" />
+					<img src="/images/profile-pic_2.png" alt="profile picture" />
 				</div>
 				<div class="profile-details">
 					<ul>
@@ -380,7 +381,7 @@
 					<a class="button button-primary" href={`profile/library?bookId=${$selectedBook._id}`}
 						>Go to book page</a
 					>
-					<button use:melt={$close} class="close-button button"> Close </button>
+					<button use:melt={$close} class="button button-close"> Close </button>
 				</div>
 			{:else if editingUserProfile && appUser}
 				<EditUserForm
@@ -453,11 +454,12 @@
 		display: flex;
 		flex-direction: row;
 		align-items: flex-start;
-		justify-content: space-between;
+		justify-content: flex-start;
 		width: 100%;
 		padding: 0;
 		margin-bottom: 5rem;
 		flex-wrap: wrap;
+		gap: 1.25rem;
 	}
 
 	.all-bookshelves-container a {
@@ -468,7 +470,7 @@
 		padding: 0 0.75rem;
 		text-transform: uppercase;
 		font-weight: 500;
-		max-width: calc(50% - 0.5rem);
+		max-width: calc(50% - 0.75rem);
 		margin-top: 0.75rem;
 		cursor: pointer;
 	}
@@ -495,6 +497,8 @@
 		padding: 1rem 0.5rem;
 		border-radius: 0;
 		position: relative;
+		box-shadow: 0px 0px 2px 0px var(--primary-black);
+		margin: 0 1px;
 	}
 
 	.book:nth-child(3n + 1) {
@@ -536,7 +540,7 @@
 		justify-content: flex-end;
 		width: 100%;
 		border: 12px solid var(--secondary-colour-purple);
-		box-shadow: inset -8px -8px 0px 0px var(--accent-pink-purple);
+		box-shadow: inset -8px -8px 0px 0px var(--accent-pink-purple), 1px 1px 2px 0px rgba(0, 0, 0, 0.4);
 		position: relative;
 		padding: 0.8rem 1.25rem 1.25rem;
 	}
@@ -571,6 +575,10 @@
 		justify-content: space-between;
 		width: 100%;
 		align-items: flex-start;
+	}
+
+	.button-action {
+		min-height: 2.75rem;
 	}
 
 	.currently-reading {
@@ -627,7 +635,6 @@
 		align-items: center;
 		justify-content: center;
 		width: 100%;
-		max-width: 800px;
 	}
 	.profile-info {
 		display: flex;
@@ -637,6 +644,8 @@
 		width: 100%;
 		margin-bottom: 2rem;
 		padding: 0;
+		max-width: 700px;
+		align-self: flex-end;
 	}
 
 	.profile-image {
@@ -644,6 +653,8 @@
 		height: 150px;
 		border-radius: 50%;
 		overflow: hidden;
+		border: 4px solid var(--accent-blue-grey);
+		outline: 8px solid var(--accent-dark-blue-grey);
 	}
 
 	.profile-image img {
@@ -655,7 +666,7 @@
 
 	.profile-details {
 		border: 12px solid var(--secondary-colour-purple);
-		box-shadow: inset -8px -8px 0px 0px var(--accent-pink-purple);
+		box-shadow: inset -8px -8px 0px 0px var(--accent-pink-purple), 1px 1px 2px 0px rgba(0, 0, 0, 0.4);
 		position: relative;
 		padding: 0.8rem 1rem 1rem;
 		margin-left: 2rem;
@@ -702,19 +713,6 @@
 		justify-content: flex-end;
 		margin-bottom: 2rem;
 		align-self: flex-end;
-	}
-	.profile-actions .button {
-		font-size: 0.7rem;
-		height: fit-content;
-		padding: 0.4rem 0.8rem;
-		border: none;
-		color: var(--primary-black);
-		box-shadow: 2px 2px 2px 0px rgba(0, 0, 0, 0.5);
-	}
-
-	.profile-actions .button:hover {
-		background-color: var(--secondary-colour-purple);
-		border-color: var(--accent-pink-purple);
 	}
 
 	.profile-page-container {
@@ -764,9 +762,15 @@
 		opacity: 0;
 	}
 
+	@media (min-width: 410px) {
+		.button-action {
+			min-height: fit-content;
+		}
+	}
+
 	@media (min-width: 590px) {
 		.all-bookshelves-container a {
-			max-width: calc(33% - 0.5rem);
+			max-width: calc(33% - 0.75rem);
 			font-size: 1rem;
 		}
 	}

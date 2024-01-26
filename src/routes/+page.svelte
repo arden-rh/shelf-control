@@ -44,6 +44,10 @@
 		color: var(--primary-white);
 		padding: 0 1rem 0 1.25rem;
 		margin-bottom: 1rem;
+		text-shadow: 1px 1px 2px var(--primary-black);
+		box-shadow:
+			inset -4px -4px 0px 0px var(--accent-pink-purple),
+			2px 2px 2px 0px rgba(0, 0, 0, 0.4);
 	}
 
 	p {

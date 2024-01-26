@@ -211,6 +211,8 @@
 		font-size: 1.75rem;
 		font-weight: 600;
 		letter-spacing: 0.05rem;
+		line-height: 1.75rem;
+		text-shadow: 1px 1px 1px var(--primary-black);
 	}
 
 	.logotype:hover {

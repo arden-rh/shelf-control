@@ -198,8 +198,9 @@
 		<div class="library-container">
 			{#if books.length === 0}
 				<div class="library-actions">
-					<a href="/profile/library/add-book" class="button button-primary">Add book</a>
-					<button on:click={editBookShelves} use:melt={$trigger} class="button button-primary"
+					<a href="/profile" class="button button-action">Profile</a>
+					<a href="/profile/library/add-book" class="button button-action">Add book</a>
+					<button on:click={editBookShelves} use:melt={$trigger} class="button button-action"
 						>Edit Bookshelves</button
 					>
 				</div>
@@ -216,14 +217,15 @@
 				</section>
 			{:else}
 				<div class="library-actions">
-					<a href="/profile/library/add-book" class="button button-primary">Add book</a>
-					<button on:click={editBookShelves} use:melt={$trigger} class="button button-primary"
+					<a href="/profile" class="button button-action">Profile</a>
+					<a href="/profile/library/add-book" class="button button-action">Add book</a>
+					<button on:click={editBookShelves} use:melt={$trigger} class="button button-action"
 						>Edit Bookshelves</button
 					>
 					<button
 						on:click={deleteLibrary}
 						use:melt={$trigger}
-						class="button button-primary delete-button">Delete Library</button
+						class="button button-action delete-button">Delete Library</button
 					>
 				</div>
 			{/if}
@@ -259,7 +261,11 @@
 						{#each books as book}
 							<div class={books.length > 1 ? 'grid-item' : 'grid-item single'}>
 								<a href={`/profile/library?bookId=${book._id}`}>
-									<img src={book.imageLinks?.thumbnail} alt={book.title} />
+									{#if book.imageLinks?.thumbnail}
+										<img src={book.imageLinks.thumbnail} alt={book.title} class="img" />
+									{:else}
+										<div class="placeholder-thumbnail img">Cover Missing</div>
+									{/if}
 									<h3>{book.title}</h3>
 								</a>
 							</div>
@@ -419,17 +425,12 @@
 	.library-actions {
 		display: flex;
 		flex-direction: row;
-		align-items: center;
+		align-items: stretch;
 		justify-content: center;
 		margin-bottom: 1.5rem;
 		align-self: flex-end;
 	}
-	.library-actions .button {
-		font-size: 0.7rem;
-		height: fit-content;
-		padding: 0.5rem 1rem;
-		border: none;
-	}
+
 	.link-container {
 		margin-top: 2rem;
 		display: flex;
@@ -464,7 +465,6 @@
 		min-height: 150px;
 		overflow: hidden;
 		background-color: var(--primary-grey);
-		padding: 1rem;
 		box-shadow: 2px 2px 2px 0px rgba(0, 0, 0, 0.6);
 		cursor: pointer;
 		justify-self: center;
@@ -482,17 +482,19 @@
 		text-align: center;
 		width: 100%;
 		height: 100%;
+		padding: 1rem;
 	}
 
 	.grid-item:hover {
 		background-color: var(--secondary-grey);
 	}
 
-	.grid-item img {
+	.grid-item .img {
 		width: auto;
+		max-width: 80%;
 		height: 120px;
-		object-fit: contain;
 		object-position: center;
+		object-fit: contain;
 		border: 4px solid var(--primary-colour-purple);
 	}
 
@@ -500,6 +502,10 @@
 		margin-top: 10px;
 		font-size: 1em;
 		word-wrap: break-word;
+	}
+
+	.grid-item .placeholder-thumbnail {
+		max-width: 70%;
 	}
 
 	.no-books,
@@ -553,15 +559,16 @@
 
 		.grid-item {
 			width: 180px;
-			min-height: 300px;
+			min-height: fit-content;
 		}
 
-		.grid-item img {
+		.grid-item .img {
 			width: auto;
-			height: 200px;
-			object-fit: contain;
-			object-position: center;
-			border: 4px solid var(--primary-colour-purple);
+			max-height: 200px;
+		}
+
+		.grid-item .placeholder-thumbnail {
+			max-width: 60%;
 		}
 	}
 </style>
