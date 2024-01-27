@@ -73,14 +73,12 @@ export const getUserBookshelves = async (userId: string) => {
 		const userDocSnapshot = await getDoc(userDocRef);
 		if (userDocSnapshot.exists()) {
 			const userData = userDocSnapshot.data();
-			return userData.allBookshelves as string[] || [];
+			return { status: 'success', message: 'User bookshelves fetched', data: userData.allBookshelves as string[] || []}
 		} else {
-			console.log('User document not found');
-			return [];
+			return { status: 'error', message: 'User document not found', data: undefined };
 		}
 	} catch (error) {
-		console.error('Error fetching user bookshelves:', error);
-		throw error;
+		return { status: 'error', message: 'Error fetching user bookshelves', data: undefined };
 	}
 };
 

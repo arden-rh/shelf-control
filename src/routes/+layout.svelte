@@ -5,7 +5,7 @@
 	import { session } from '$lib/stores/session.stores';
 	import { signOut } from 'firebase/auth';
 	import { userStore } from '$lib/stores/user.stores';
-	import Toaster from '$lib/components/Toaster.svelte';
+	import Toaster, { addToast } from '$lib/components/Toaster.svelte';
 	import type { AppUser } from '$lib/types/user.types';
 	import type { LayoutData } from './$types';
 	import type { SessionState } from '$lib/types/session.types';
@@ -50,12 +50,13 @@
 			if (storedAppUser) {
 				userStore.set(JSON.parse(storedAppUser));
 			} else {
-				console.log('No stored user found');
+				console.error('No stored user found');
 			}
 
 			loading = false;
 		} catch (error) {
 			console.error('Error fetching user:', error);
+			loading = false;
 		}
 
 		if (!loggedIn && !storedAppUser) {
@@ -73,7 +74,9 @@
 			localStorage.removeItem('loggedIn');
 			goto('/login');
 		} catch (error) {
-			console.error('Logout failed:', error);
+			addToast({
+				data: { title: 'error', description: 'Error logging out', status: 'error' }
+			});
 		}
 	}
 </script>

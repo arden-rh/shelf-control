@@ -169,8 +169,8 @@
 		if (appUser?.uid) {
 			const response = await getUserBookshelves(appUser.uid);
 
-			if (response) {
-				bookshelves = response;
+			if (response?.status === "success" && response.data) {
+				bookshelves = response.data;
 				bookshelvesStore.set(bookshelves);
 				loading = false;
 			}
