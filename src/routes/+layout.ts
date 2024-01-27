@@ -20,7 +20,6 @@ export async function load({ url }) {
 			onAuthStateChanged(auth, (user) => {
 				resolve(user ? user : false);
 			});
-			console.log('Auth state changed');
 		});
 	}
 

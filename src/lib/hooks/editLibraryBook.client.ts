@@ -33,10 +33,8 @@ export async function editLibraryBook(userId: string, data: LibraryBookWithId) {
 			error.set(true);
 
 			if (e instanceof FirebaseError) {
-				console.error('Error updating book FB:', e);
 				errorMsg.set(e.message);
 			} else if (e instanceof Error) {
-				console.error('Error updating book:', e);
 				errorMsg.set(e.message);
 			} else {
 				errorMsg.set('Something went wrong, please try again');
@@ -48,10 +46,8 @@ export async function editLibraryBook(userId: string, data: LibraryBookWithId) {
 		error.set(true);
 
 		if (e instanceof FirebaseError) {
-			console.error('Error updating book FB:', e);
 			errorMsg.set(e.message);
 		} else if (e instanceof Error) {
-			console.error('Error updating book:', e);
 			errorMsg.set(e.message);
 		} else {
 			errorMsg.set('Something went wrong, please try again');

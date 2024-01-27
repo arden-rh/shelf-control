@@ -16,7 +16,6 @@ export const load: PageServerLoad = async (context) => {
 	try {
 
 		if (author) {
-			console.log('author', author)
 			const res = await fetch(
 				`${import.meta.env.VITE_GOOGLE_BOOKS_API_URL}?q=${query}+inauthor:${author}` +
 					maxResults +
