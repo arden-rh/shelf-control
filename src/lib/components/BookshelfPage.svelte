@@ -85,7 +85,6 @@
 				}
 			}
 		} catch (error) {
-			console.error(error);
 			addToast({
 				data: {
 					title: 'Error',
@@ -152,11 +151,17 @@
 			const response = await getBooksByBookshelf(user?.uid, bookshelf);
 
 			if (response) {
-				bookshelfBooks = response;
+				bookshelfBooks = response.data;
 				currentBookshelfBooks.set(bookshelfBooks);
 			}
 		} catch (error) {
-			console.error(error);
+			addToast({
+				data: {
+					title: 'Error',
+					description: 'Failed to get bookshelf books',
+					status: 'error'
+				}
+			});
 		}
 	}
 </script>

@@ -173,7 +173,7 @@
 	</div>
 	{#if data}
 		{#if data.status === 200}
-			{#if data.props.data.items}
+			{#if data.props?.data.items}
 				<ul class="book-list">
 					{#each data.props.data.items as book}
 						<li class="book-list-item mb-3 flex">

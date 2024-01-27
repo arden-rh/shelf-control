@@ -31,14 +31,12 @@ export const getUserLibraryBook = async (userId: string, bookId: string) => {
 		const bookDocRef = doc(libraryCollectionRef, bookId);
 		const bookSnapshot = await getDoc(bookDocRef);
 		if (bookSnapshot.exists()) {
-			return bookSnapshot.data() as LibraryBookWithId;
+			return { status: 'success', message: 'Got library book', data: bookSnapshot.data() as LibraryBookWithId};
 		} else {
-			console.log('No such book!');
-			return undefined;
+			return { status: 'error', message: 'Found no matching book', data: undefined };
 		}
 	} catch (error) {
-		console.error('Error getting book:', error);
-		return undefined;
+		return { status: 'error', message: 'Error getting book', data: undefined };
 	}
 };
 
@@ -58,10 +56,10 @@ export const getBooksByBookshelf = async (userId: string, bookshelf: string) => 
 		const q = query(userLibraryRef, where('bookshelves', 'array-contains', bookshelf));
 		const querySnapshot = await getDocs(q);
 
-		return querySnapshot.docs.map((doc) => doc.data()) as LibraryBookWithId[];
+		return { status: 'success', message: 'Succesfully got books', data: querySnapshot.docs.map((doc) => doc.data()) as LibraryBookWithId[] };
 	} catch (error) {
 		console.error('Error fetching books for user:', error);
-		return [];
+		return { status: 'error', message: 'Error fetching books for user', data: [] };
 	}
 };
 
@@ -80,10 +78,10 @@ export const getBooksByReadingStatus = async (userId: string, readingStatus: str
 		const q = query(userLibraryRef, where('readingStatus', '==', readingStatus));
 		const querySnapshot = await getDocs(q);
 
-		return querySnapshot.docs.map((doc) => doc.data()) as LibraryBookWithId[];
+		return { status: 'success', message: 'Reading status updated successfully', data: querySnapshot.docs.map((doc) => doc.data()) as LibraryBookWithId[] };
 	} catch (error) {
 		console.error('Error fetching books for user:', error);
-		return [];
+		return { status: 'error', message: 'Error fetching books for user', data: [] };
 	}
 };
 
@@ -197,8 +195,8 @@ export const addUniqueBookshelvesAndUpdateUser = async (
 		});
 
 		await batch.commit();
+		return { status: 'success', message: 'Bookshelves updated successfully' };
 	} catch (error) {
-		console.error('Error updating bookshelves:', error);
-		throw error;
+		return { status: 'error', message: 'Error updating bookshelves' };
 	}
 };

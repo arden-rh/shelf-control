@@ -244,8 +244,17 @@
 		if (appUser?.uid && appUser?.favouriteShelf) {
 			const response = await getBooksByBookshelf(appUser.uid, appUser.favouriteShelf);
 
-			if (response) {
-				books = response;
+			if (response?.status === 'success') {
+				books = response.data;
+				loading = false;
+			} else {
+				addToast({
+					data: {
+						title: 'Error',
+						description: 'Failed to get favourite shelf',
+						status: 'error'
+					}
+				});
 				loading = false;
 			}
 		}
@@ -267,7 +276,7 @@
 			const response = await getBooksByReadingStatus(appUser.uid, 'reading');
 
 			if (response) {
-				currentlyReadingBooks = response;
+				currentlyReadingBooks = response.data;
 				loading = false;
 			}
 		}

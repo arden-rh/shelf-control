@@ -31,7 +31,17 @@ export async function createLibraryBook(userId: string, data: LibraryBook) {
 
 			return { success: true, bookId: docRef.id };
 		} catch (e) {
-			console.log('error', e);
+			error.set(true);
+
+			if (e instanceof FirebaseError) {
+				errorMsg.set(e.message);
+			} else if (e instanceof Error) {
+				errorMsg.set(e.message);
+			} else {
+				errorMsg.set('Something went wrong, please try again');
+			}
+
+			return { success: false, error: errorMsg };
 		}
 	} catch (e) {
 		error.set(true);

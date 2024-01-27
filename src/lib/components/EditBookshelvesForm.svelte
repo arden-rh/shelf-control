@@ -27,7 +27,6 @@
 		addOnPaste: true
 	});
 
-
     function handleSaveChanges() {
 
         const formData = {
@@ -65,7 +64,6 @@
 				class="data-[invalid-edit]:focus flex items-center overflow-hidden px-1.5 [word-break:break-word]"
 			/>
 		{/each}
-
 		<input
 			use:melt={$input}
 			type="text"

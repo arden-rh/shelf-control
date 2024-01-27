@@ -7,6 +7,7 @@
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import type { UserCredential } from 'firebase/auth';
+	import { addToast } from '$lib/components/Toaster.svelte';
 
 	let email: string = '';
 	let password: string = '';
@@ -40,10 +41,14 @@
 
 				goto('/profile');
 			} catch (error) {
-				console.error(error);
+				addToast({
+					data: { title: 'error', description: 'Error logging in', status: 'error' }
+				});
 			}
 		} catch (error) {
-			console.error(error);
+			addToast({
+				data: { title: 'error', description: 'Error logging in', status: 'error' }
+			});
 		}
 	}
 
@@ -80,7 +85,6 @@
 				</div>
 			</form>
 		</div>
-
 		<a class="button button-secondary" href="/register">Don't have an account? Register here</a>
 		<div class="page-header">
 			<h1>Login Page</h1>

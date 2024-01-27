@@ -59,6 +59,7 @@
 			goto('/profile');
 		} catch (error) {
 			console.log('error', error);
+			throw error;
 		}
 	}
 

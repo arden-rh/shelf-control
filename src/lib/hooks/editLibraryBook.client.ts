@@ -30,7 +30,19 @@ export async function editLibraryBook(userId: string, data: LibraryBookWithId) {
 			success.set(true);
 			return { status: 'success', message: 'Book updated successfully' };
 		} catch (e) {
-			console.log('error', e);
+			error.set(true);
+
+			if (e instanceof FirebaseError) {
+				console.error('Error updating book FB:', e);
+				errorMsg.set(e.message);
+			} else if (e instanceof Error) {
+				console.error('Error updating book:', e);
+				errorMsg.set(e.message);
+			} else {
+				errorMsg.set('Something went wrong, please try again');
+			}
+
+			return { status: 'error', message: errorMsg };
 		}
 	} catch (e) {
 		error.set(true);

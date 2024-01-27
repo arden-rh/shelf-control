@@ -56,6 +56,6 @@ export const load: PageServerLoad = async (context) => {
 			}
 		};
 	} catch (err) {
-		console.log(err);
+		return { status: 500, error: 'Server Error' }
 	}
 };

@@ -24,14 +24,10 @@
 	categoriesString = categories.join('/');
 	bookshelvesString = bookshelves.join('/');
 
-	console.log('categoriesString', categoriesString);
-	console.log('categories', categories);
-
 	async function handleSubmit() {
 		authors = authorsString.split('/');
 		categories = categoriesString.split('/');
 		bookshelves = bookshelvesString.split('/');
-		console.log('categories', categories);
 
 		const formData = {
 			title,
@@ -74,17 +70,14 @@
 				<small>Separate authors with a forward slash (/)</small>
 			</div>
 		</span>
-
 		<span>
 			<label for="book-publisher">Publisher</label>
 			<input id="book-publisher" bind:value={publisher} placeholder="Book Publisher" />
 		</span>
-
 		<span>
 			<label for="book-date">Published Date</label>
 			<input id="book-date" type="date" bind:value={publishedDate} />
 		</span>
-
 		<span>
 			<label for="book-print-type">Print Type</label>
 			<input id="book-print-type" bind:value={printType} />
@@ -94,17 +87,14 @@
 			<label for="book-page-count">Page Count</label>
 			<input id="book-page-count" type="number" bind:value={pageCount} />
 		</span>
-
 		<span>
 			<label for="book-language">Language</label>
 			<input id="book-language" bind:value={language} placeholder="Book Language" />
 		</span>
-
 		<span>
 			<label for="book-industry-identifier">Industry Identifier</label>
 			<input id="book-industry-identifier" bind:value={industryIdentifier} placeholder="Book Industry Identifier" />
 		</span>
-
 		<span>
 			<label for="book-categories">Categories</label>
 			<div class="input-with-help-text">
@@ -121,17 +111,14 @@
 				>
 			</div>
 		</span>
-
 		<span>
 			<label for="book-description">Description</label>
 			<textarea id="book-description" bind:value={description} placeholder="Book Description" />
 		</span>
-
 		<!-- <span>
 			<label for="book-image">Image URL</label>
 			<input id="book-image" bind:value={bookImage} placeholder="Book Image URL" />
 		</span> -->
-
 		<span>
 			<label for="reading-status">Reading Status</label>
 			<select id="reading-status" bind:value={readingStatus}>
@@ -140,7 +127,6 @@
 				<option value="read">Read</option>
 			</select>
 		</span>
-
 		<div class="button-group">
 			<button class="button button-primary" type="submit">Save Changes</button>
 			<button class="button button-secondary button-delete" type="button" on:click={handleDelete}

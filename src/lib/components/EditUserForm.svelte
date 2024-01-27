@@ -50,17 +50,14 @@
 			<label for="favourite-book">Favourite Book</label>
 			<input id="favourite-book" bind:value={favouriteBook} placeholder="Favourite Book" />
 		</span>
-
 		<span>
 			<label for="favourite-author">Favourite Author</label>
 			<input id="favourite-author" bind:value={favouriteAuthor} placeholder="Favourite Author" />
 		</span>
-
 		<span>
 			<label for="favourite-genre">Favourite Genre</label>
 			<input id="favourite-genre" bind:value={favouriteGenre} placeholder="Favourite Genre" />
 		</span>
-
 		<span>
 			{#if bookshelves}
 				<label for="favourite-shelf">Favourite Shelf</label>
@@ -71,7 +68,6 @@
 				</select>
 			{/if}
 		</span>
-
 		<span><h3>Privacy Options</h3></span>
 		<span>
 			<label for="profile-picture">Profile Picture</label>
@@ -81,7 +77,6 @@
 				<option value="none">None</option>
 			</select>
 		</span>
-
 		<span>
 			<label for="favourites">Favourites</label>
 			<select id="favourites" bind:value={privateInfo.favourites}>

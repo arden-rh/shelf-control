@@ -66,8 +66,6 @@
 			return;
 		}
 
-		console.log('Handling update book', formData);
-
 		try {
 			const response = await editLibraryBook(user.uid, {
 				...formData,

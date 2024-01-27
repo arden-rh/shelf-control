@@ -19,6 +19,11 @@ export const getUserLibraryCollection = async (userId: string) => {
 	}
 
 	const userDocRef = doc(db, 'users', userId);
+
+	if (!userDocRef) {
+		throw new Error('Unable to get user document reference');
+	}
+	
 	return collection(userDocRef, 'library');
 };
 
@@ -111,8 +116,7 @@ export const updateUserLibraryBookshelves = async (userId: string, bookshelves: 
 		await updateDoc(userDocRef, { allBookshelves: bookshelves });
 		return { status: 'success', message: 'Bookshelves updated successfully' };
 	} catch (error) {
-		console.error('Error updating user bookshelves:', error);
-		throw error;
+		return { status: 'error', message: 'Error updating bookshelves' };
 	}
 };
 
@@ -135,7 +139,6 @@ export const deleteUserLibrary = async (userId: string) => {
 
 		return { status: 'success', message: 'Library deleted successfully' };
 	} catch (error) {
-		console.error('Error deleting user library:', error);
-		throw error;
+		return { status: 'error', message: 'Error deleting user library' };
 	}
 };

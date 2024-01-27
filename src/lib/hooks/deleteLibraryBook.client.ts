@@ -29,7 +29,17 @@ export async function deleteLibraryBook(userId: string, bookId: string) {
 			success.set(true);
 			return { status: 'success', message: 'Book deleted successfully' };
 		} catch (e) {
-			console.log('error', e);
+			error.set(true);
+
+			if (e instanceof FirebaseError) {
+				errorMsg.set(e.message);
+			} else if (e instanceof Error) {
+				errorMsg.set(e.message);
+			} else {
+				errorMsg.set('Something went wrong, please try again');
+			}
+
+			return { status: 'error', message: errorMsg };
 		}
 	} catch (e) {
 		error.set(true);

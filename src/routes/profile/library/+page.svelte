@@ -155,7 +155,13 @@
 			books = await getUserLibraryBooks(userId);
 			allBookStore.set(books);
 		} catch (error) {
-			console.error('Error fetching books:', error);
+			addToast({
+				data: {
+					title: 'Error',
+					description: 'Failed to fetch books',
+					status: 'error'
+				}
+			});
 		}
 	}
 
@@ -176,10 +182,17 @@
 		if (user && user.uid && bookId) {
 			try {
 				const response = await getUserLibraryBook(user.uid, bookId);
-				book = response;
+				book = response.data;
 				loading = false;
 			} catch (error) {
-				console.error(error);
+				addToast({
+					data: {
+						title: 'Error',
+						description: 'Failed to fetch book',
+						status: 'error'
+					}
+				});
+				loading = false;
 			}
 		}
 	}
