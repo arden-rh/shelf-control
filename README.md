@@ -1,6 +1,8 @@
 # shelf-control
 
-a web app for managing your book library
+### 📚 Final degree project <br>
 
-A degree project from Arden Haldorson
+A web app for managing your personal book library. <br>
+Built in Svelte with SvelteKit, Firebase and PostCSS.
+
 
