@@ -52,8 +52,6 @@
 
 		const formData = event.detail;
 
-		formData.industryIdentifier
-
 		const bookValue = toLibraryBook(formData, true);
 
 		const userId = user.uid;
