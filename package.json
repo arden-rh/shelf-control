@@ -1,6 +1,6 @@
 {
-	"name": "fed22m-exjobb-arden-rh",
-	"version": "0.0.1",
+	"name": "shelf-control",
+	"version": "0.0.2",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
@@ -15,6 +15,14 @@
 		"test:unit": "vitest",
 		"predeploy": "npm run build",
 		"deploy": "netlify deploy --prod"
+	},
+	"dependencies": {
+		"firebase": "^10.12.4",
+		"lucide-svelte": "^0.311.0",
+		"postcss-functions": "^4.0.2",
+		"postcss-import": "^16.0.0",
+		"postcss-js": "^4.0.1",
+		"postcss-nested": "^6.0.1"
 	},
 	"devDependencies": {
 		"@melt-ui/pp": "^0.3.0",
@@ -31,6 +39,7 @@
 		"eslint-config-prettier": "^9.0.0",
 		"eslint-plugin-svelte": "^2.30.0",
 		"netlify-cli": "^17.33.4",
+		"npm-force-resolutions": "^0.0.10",
 		"postcss": "^8.4.33",
 		"postcss-load-config": "^5.0.2",
 		"prettier": "^3.0.0",
@@ -44,13 +53,5 @@
 		"vite": "^5.0.13",
 		"vitest": "^1.0.0"
 	},
-	"type": "module",
-	"dependencies": {
-		"firebase": "^10.12.4",
-		"lucide-svelte": "^0.311.0",
-		"postcss-functions": "^4.0.2",
-		"postcss-import": "^16.0.0",
-		"postcss-js": "^4.0.1",
-		"postcss-nested": "^6.0.1"
-	}
+	"type": "module"
 }
