@@ -38,7 +38,7 @@
 		"eslint": "^8.28.0",
 		"eslint-config-prettier": "^9.0.0",
 		"eslint-plugin-svelte": "^2.30.0",
-		"netlify-cli": "^17.36.2",
+		"netlify-cli": "^23.0.0",
 		"npm-force-resolutions": "^0.0.10",
 		"postcss": "^8.4.33",
 		"postcss-load-config": "^5.0.2",
