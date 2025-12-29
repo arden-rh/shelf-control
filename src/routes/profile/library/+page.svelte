@@ -293,7 +293,7 @@
 <!-- Dialog -->
 <div id="dialog" use:melt={$portalled}>
 	{#if $open}
-		<div class="fixed inset-0 z-50 bg-black/50" use:melt={$overlay} />
+		<div class="fixed inset-0 z-50 bg-black/50" use:melt={$overlay}></div>
 		<div
 			class="dialog fixed left-[50%] top-[50%] z-50 max-h-[85vh]
         w-[90vw] max-w-[550px] translate-x-[-50%] translate-y-[-50%]
